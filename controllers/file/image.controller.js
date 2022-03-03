@@ -1,19 +1,20 @@
 /**
- * @method uploadImage 上传图片文件
+ * @method upload 上传图片文件
  */
-exports.uploadImage = {
+exports.upload = {
     method: "POST",
     handle: async (req, res) => {
-
+        console.log(req.body)
+        res.send("hello")
     }
 }
 /**
- * @method downloadImage 下载图片文件
+ * @method download 下载图片文件
  */
-exports.downloadImage = {
+exports.download = {
     method: "POST",
     handle: async (req, res) => {
-
+        console.log(req.params);
     }
 }
 /**
