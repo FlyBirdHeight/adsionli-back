@@ -1,3 +1,5 @@
+import { ImageService } from "./service/image.service.js"
+const imageService = new ImageService();
 /**
  * @method upload 上传图片文件
  */

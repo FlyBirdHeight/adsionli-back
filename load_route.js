@@ -1,8 +1,11 @@
 'use strict'
+import { createRequire } from 'module';
+import { compose } from './lib/compose.js';
+const require = createRequire(import.meta.url);
 const glob = require('glob');
 const fs = require('fs');
 const METHOD_ENUM = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
-const compose = require('./lib/compose')
+
 const getController = (path) => {
     let res = [];
     const fileList = glob.sync(`${path}/*`);
@@ -113,4 +116,4 @@ const loader = (app, root, options) => {
     }
 }
 
-module.exports = loader;
+export { loader };
