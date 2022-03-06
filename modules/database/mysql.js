@@ -2,6 +2,7 @@ import mysql from "mysql";
 import { createRequire } from 'module';
 import ConnectError from "../../error/database/connect_error.js";
 import PoolError from "../../error/database/pool_error.js";
+import NoDatabase from "../../error/database/no_database.js";
 const require = createRequire(import.meta.url);
 class Database {
     constructor() {
@@ -18,18 +19,30 @@ class Database {
         return this.config;
     }
 
+    /**
+     * @method setDatabase 设置数据库
+     * @param {string} database  数据库名称
+     * @param {string} name Model名称
+     */
     setDatabase(database, name) {
-        this.database.set(name, database);
-        if (this.databaseList.indexOf(database) === -1) {
-            this.databaseList.push(database)
-            this.createPool(database);
+        if (!Reflect.has(this.config, database)) {
+            throw new NoDatabase()
         }
+        if (this.database.has(name)) {
+            return;
+        }
+        this.database.set(name, database);
+        if (this.databaseList.indexOf(database) !== -1) {
+            return;
+        }
+        this.databaseList.push(database)
+        this.createPool(database);
     }
 
     createPool(database) {
         let configData = Object.assign({
             connectionLimit: 100
-        }, this.config)
+        }, this.config[database])
         this.pool.set(database, mysql.createPool(configData))
     }
 
@@ -39,6 +52,9 @@ class Database {
      * @param {*} sqlData 传入的Sql参数
      */
     usePool(name, sql, sqlData = []) {
+        if (!this.database.has(name)) {
+            throw new ConnectError("未创建数据库连接池！");
+        }
         if (!this.pool.has(this.database.get(name))) {
             throw new ConnectError("未创建数据库连接池！");
         }
