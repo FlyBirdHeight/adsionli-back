@@ -1,5 +1,8 @@
 import { createRequire } from 'module';
 import { loader } from './load_route.js';
+import os from "os";
+var ifaces = os.networkInterfaces();
+
 const require = createRequire(import.meta.url);
 var createError = require('http-errors');
 var express = require('express');
