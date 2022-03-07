@@ -34,19 +34,23 @@ class Image extends Model {
     async insert(data) {
         try {
             let filter = new ImageInsertFilter(data);
-            let status = filter(data);
+            let status = filter.verification();
             if (status) {
-                let url = Image.generateUrl(ipConfig, data.path);
-                let sql = "insert into files(path, type, name, description, url) value(?,?,?,?,?)"
+                let url = Image.generateUrl(ipConfig, data.url);
+                let sql = "insert into files(path, type, name, description, url, size) value(?,?,?,?,?,?)"
                 let insertData = [
                     data.path,
                     0,
                     data.name || '',
                     data.description || '',
-                    url
+                    url,
+                    data.size || 0
                 ]
                 let result = await this.database.usePool(this.name, sql, insertData);
-                return result;
+                return {
+                    status: result,
+                    url
+                };
             }
         } catch (e) {
             throw e;
@@ -59,7 +63,7 @@ class Image extends Model {
      * @param {string} path 存放地址
      */
     static generateUrl(ip, path) {
-        return `${ip}:${host}${path}`
+        return `http://${ip}:${host}${path}`
     }
 }
 

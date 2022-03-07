@@ -11,13 +11,14 @@ class Filter {
     verification() {
         try {
             for (let key of Reflect.ownKeys(this.data)) {
+                console.log(key);
                 if (!Reflect.has(this.rules, key)) {
                     continue;
                 }
                 for (let rule of Reflect.ownKeys(this.rules)) {
                     if (this.rules[rule] instanceof Array) {
                         this.rules[rule].forEach(v => {
-                            Filter.verData()
+                            Filter.verData(v, key, this.data, this.rules)
                         })
                     } else {
                         Filter.verData()
@@ -60,7 +61,7 @@ class Filter {
                 }
                 break;
             case 'notEmpty':
-                status = Rule.notEmpty(data[key])
+                status = Rule.notEmpty(key, data)
                 if (!status) {
                     throw new FilterError(`${key} is empty, please pass in the current property！`);
                 }
