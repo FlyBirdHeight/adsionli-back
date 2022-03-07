@@ -35,7 +35,7 @@ class Database {
         if (this.databaseList.indexOf(database) !== -1) {
             return;
         }
-        this.databaseList.push(database)
+        this.databaseList.push(database);
         this.createPool(database);
     }
 

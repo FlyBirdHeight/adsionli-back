@@ -1,4 +1,4 @@
-exports.dateFormat = (format, date) => {
+var dateFormat = (format, date) => {
     let ret;
     const opt = {
         "y+": date.getFullYear().toString(), // 年
@@ -15,6 +15,8 @@ exports.dateFormat = (format, date) => {
             format = format.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
         };
     };
-    
+
     return format;
 }
+
+export { dateFormat }

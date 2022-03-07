@@ -1,4 +1,4 @@
-import ApplicationError from "../../lib/error";
+import ApplicationError from "../../lib/error.js";
 
 export default class NoDatabase extends ApplicationError {
     constructor(message, options = {}) {

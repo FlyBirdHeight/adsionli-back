@@ -39,27 +39,28 @@ class Filter {
      * @param {Object} ruleData 
      */
     static verData(rule, key, data, ruleData) {
+        let status;
         switch (rule) {
             case 'isNumber':
-                const status = Rule.isNumber(data[key])
+                status = Rule.isNumber(data[key])
                 if (!status) {
                     throw new FilterError(`${key} is not number!`);
                 }
                 break;
             case 'isString':
-                const status = Rule.isString(data[key])
+                status = Rule.isString(data[key])
                 if (!status) {
                     throw new FilterError(`${key} is not string!`);
                 }
                 break;
             case 'notNullorUndefined':
-                const status = Rule.notNullorUndefined(data[key])
+                status = Rule.notNullorUndefined(data[key])
                 if (!status) {
                     throw new FilterError(`${key} is null or undefined!`);
                 }
                 break;
             case 'notEmpty':
-                const status = Rule.notEmpty(data[key])
+                status = Rule.notEmpty(data[key])
                 if (!status) {
                     throw new FilterError(`${key} is empty, please pass in the current property！`);
                 }
@@ -68,7 +69,7 @@ class Filter {
                 Rule.canEmpty(data[key])
                 break;
             case 'ObjEqual':
-                const status = Rule.ObjEqual(data[key], ruleData[key])
+                status = Rule.ObjEqual(data[key], ruleData[key])
                 if (!status) {
                     throw new FilterError(`${key} requires that the incoming property does not match the template property!`);
                 }

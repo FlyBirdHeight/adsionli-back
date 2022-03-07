@@ -1,6 +1,5 @@
-import ApplicationError from "../../lib/error";
-
-export default class ConnectError extends ApplicationError {
+import ApplicationError from "../../lib/error.js";
+class ConnectError extends ApplicationError {
     constructor(message, options = {}) {
         super(message, options)
     }
@@ -9,3 +8,5 @@ export default class ConnectError extends ApplicationError {
         return 1000;
     }
 }
+
+export default ConnectError;

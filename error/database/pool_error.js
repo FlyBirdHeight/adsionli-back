@@ -1,6 +1,5 @@
-import ApplicationError from "../../lib/error";
-
-export default class PoolError extends ApplicationError {
+import ApplicationError from "../../lib/error.js";
+class PoolError extends ApplicationError {
     constructor(message, options = {}) {
         super(message, options)
     }
@@ -17,3 +16,5 @@ export default class PoolError extends ApplicationError {
         return 1001
     }
 }
+
+export default PoolError

@@ -1,3 +1,5 @@
+import { PageService } from "./service/page.service.js"
+const pageService = new PageService()
 /**
  * @method uploadPage 上传文章
  */

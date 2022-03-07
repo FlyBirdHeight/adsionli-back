@@ -6,8 +6,12 @@ const imageService = new ImageService();
 exports.upload = {
     method: "POST",
     handle: async (req, res) => {
-        console.log(req.body)
-        res.send("hello")
+        try {
+            let returnData = await imageService.uploadImage(req);
+            res.send(returnData)
+        } catch (e) {
+            console.log(e);
+        }
     }
 }
 /**

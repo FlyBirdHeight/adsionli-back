@@ -11,3 +11,5 @@ class ImageInsertFilter extends Filter {
         }, data)
     }
 }
+
+export default ImageInsertFilter;

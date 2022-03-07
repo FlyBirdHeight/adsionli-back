@@ -1,15 +1,21 @@
-var select = function (table) {
+var Select = function (table) {
     this.table = table;
 }
 
-select.prototype.findById = async function(id){
+Select.prototype.findById = function (id) {
 
 }
 
-select.prototype.findOne = async function(data){
+Select.prototype.findOne = function (data) {
 
 }
 
-select.prototype.findAll = async function(data){
+Select.prototype.findAll = function (data) {
 
 }
+
+Select.prototype.joinQuery = function (table2, data) {
+
+}
+
+export default select;
