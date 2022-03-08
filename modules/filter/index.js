@@ -11,7 +11,6 @@ class Filter {
     verification() {
         try {
             for (let key of Reflect.ownKeys(this.data)) {
-                console.log(key);
                 if (!Reflect.has(this.rules, key)) {
                     continue;
                 }

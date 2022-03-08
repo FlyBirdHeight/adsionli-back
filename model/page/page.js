@@ -3,7 +3,7 @@ import PageInsertFilter from "../../filter/page/PageInsertFilter";
 
 class Page extends Models {
     constructor() {
-        super('local', 'page')
+        super('local', 'pages', 'pages')
         this.structure = {
             id: null,
             title: '',

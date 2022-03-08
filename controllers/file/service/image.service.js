@@ -15,11 +15,22 @@ class ImageService {
         try {
             let insertData = await this.handleImageSave(req);
             let status = await this.model.insert(insertData.data);
-            return {
-                status: true,
-                message: "上传并保存成功",
-                url: status.url
+            if (status.rewrite) {
+                return {
+                    status: false,
+                    message: "上传失败，当前图片名称已存在",
+                    rewrite: status.rewrite,
+                    url: status.url,
+                }
+            } else {
+                return {
+                    status: true,
+                    message: "上传并保存成功",
+                    rewrite: status.rewrite,
+                    url: status.url,
+                }
             }
+
         } catch (e) {
             throw e;
         }
