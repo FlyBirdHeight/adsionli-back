@@ -21,6 +21,7 @@ class ImageService {
                     message: "上传失败，当前图片名称已存在",
                     rewrite: status.rewrite,
                     url: status.url,
+                    id: status.id
                 }
             } else {
                 return {

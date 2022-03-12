@@ -1,3 +1,5 @@
+import TagCategoryService from "./service/tag_category.service"
+let categoryTagService = new TagCategoryService();
 /**
  * @method create 创建分类或标签
  */
@@ -25,14 +27,19 @@ exports.get = [
         method: "GET",
         path: "tagList",
         handle: async (req, res) => {
-
+            console.log(req.originalUrl)
         }
     },
     {
         method: "GET",
         path: "categoryList",
         handle: async (req, res) => {
-
+            let returnData = await categoryTagService.getCategoryList(req.query.page, req.query.count);
+            console.log(returnData)
+            res.send({
+                status: true,
+                data: []
+            })
         }
     },
 ]
