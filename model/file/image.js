@@ -14,7 +14,9 @@ let ipConfig = "127.0.0.1";
 // }
 class Image extends Model {
     constructor() {
-        super('local', 'images', 'files');
+        super('local', 'images', 'files', [
+            'path', 'type', 'name', 'description', 'url', 'size'
+        ]);
         this.structure = {
             id: null,
             path: '',
@@ -31,7 +33,7 @@ class Image extends Model {
      * @method insert 添加图片文件
      * @param {*} data 等待添加数据
      */
-    async insert(data) {
+    async insertImage(data) {
         try {
             let filter = new ImageInsertFilter(data);
             let status = filter.verification();

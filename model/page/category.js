@@ -2,7 +2,9 @@ import Models from "../../lib/model";
 
 class Category extends Models {
     constructor() {
-        super('local', 'category', 'category')
+        super('local', 'category', 'category', [
+            'name', 'desc', 'is_show', 'is_recommend', 'sort'
+        ])
         this.structure = {
             id: null,
             name: "",

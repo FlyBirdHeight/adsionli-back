@@ -14,7 +14,7 @@ class ImageService {
     async uploadImage(req) {
         try {
             let insertData = await this.handleImageSave(req);
-            let status = await this.model.insert(insertData.data);
+            let status = await this.model.insertImage(insertData.data);
             if (status.rewrite) {
                 return {
                     status: false,

@@ -22,6 +22,14 @@ class TagCategoryService {
             }
         })
     }   
+
+    /**
+     * @method insertCategory 添加分类
+     * @param {*} insertData 添加分类数据
+     */
+    insertCategory(insertData){
+        return this.categoryModel.insert(insertData);
+    }
 }
 
 export default TagCategoryService;

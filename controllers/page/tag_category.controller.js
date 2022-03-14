@@ -15,7 +15,7 @@ exports.create = [
         method: "POST",
         path: "category",
         handle: async (req, res) => {
-
+            console.log(res.body);
         }
     }
 ]
@@ -34,12 +34,18 @@ exports.get = [
         method: "GET",
         path: "categoryList",
         handle: async (req, res) => {
-            let returnData = await categoryTagService.getCategoryList(req.query.page, req.query.count);
-            console.log(returnData)
-            res.send({
-                status: true,
-                data: []
-            })
+            try {
+                let returnData = await categoryTagService.getCategoryList(req.query.page, req.query.count);
+                res.send({
+                    status: true,
+                    data: returnData
+                })
+            } catch (error) {
+                res.status(500).send({
+                    status: false,
+                    errorMessage: error.message
+                })
+            }
         }
     },
 ]
