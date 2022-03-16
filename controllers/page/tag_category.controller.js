@@ -15,7 +15,16 @@ exports.create = [
         method: "POST",
         path: "category",
         handle: async (req, res) => {
-            console.log(res.body);
+            try {
+                let status = await categoryTagService.insertCategory(req.body);
+                res.send({
+                    status: true
+                })
+            } catch (e) {
+                res.status(400).send({
+                    message: e.message
+                })
+            }
         }
     }
 ]
