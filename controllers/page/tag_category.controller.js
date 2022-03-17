@@ -93,7 +93,10 @@ exports.delete = [
         method: "DELETE",
         path: "category",
         handle: async (req, res) => {
-
+            console.log(req.body)
+            res.send({
+                status: true
+            })
         }
     }
 ]

@@ -16,19 +16,30 @@ class TagCategoryService {
         return this.categoryModel.find({
             page: page || 1,
             count: count || 20,
+            where: {
+                is_delete: 0
+            },
             sort: {
                 name: "sort",
                 type: "asc"
             }
         })
-    }   
+    }
 
     /**
      * @method insertCategory 添加分类
      * @param {*} insertData 添加分类数据
      */
-    insertCategory(insertData){
+    insertCategory(insertData) {
         return this.categoryModel.insert(insertData);
+    }
+
+    /**
+     * @method deleteCategory 删除指定id分类
+     * @param {number[]} deleteId id数组
+     */
+    deleteCategory(deleteId) {
+        return this.categoryModel.delete(deleteId);
     }
 }
 
