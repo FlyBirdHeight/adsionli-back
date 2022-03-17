@@ -65,15 +65,31 @@ exports.get = [
 exports.getInfo = [
     {
         method: "GET",
-        path: "tag",
+        path: "tag/:id",
         handle: async (req, res) => {
-
+            console.log(req.params.id);
+            res.send({
+                data: [],
+                status: true
+            })
         }
     },
     {
         method: "GET",
-        path: "category",
+        path: "category/:id",
         handle: async (req, res) => {
+            let returnData = await categoryTagService.getCategoryInfo(req.params.id);
+            if (returnData) {
+                res.send({
+                    data: returnData[0],
+                    status: true
+                })
+            } else {
+                res.send({
+                    data: null,
+                    status: false
+                })
+            }
 
         }
     }
@@ -93,7 +109,7 @@ exports.delete = [
         method: "DELETE",
         path: "category",
         handle: async (req, res) => {
-            console.log(req.body)
+            categoryTagService.deleteCategory(req.body.id)
             res.send({
                 status: true
             })

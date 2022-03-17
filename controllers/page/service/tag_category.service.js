@@ -12,8 +12,8 @@ class TagCategoryService {
      * @param {number} page
      * @param {number} count
      */
-    getCategoryList(page, count) {
-        return this.categoryModel.find({
+    async getCategoryList(page, count) {
+        let data = await this.categoryModel.find({
             page: page || 1,
             count: count || 20,
             where: {
@@ -23,7 +23,17 @@ class TagCategoryService {
                 name: "sort",
                 type: "asc"
             }
+        });
+        let dataCount = await this.categoryModel.getCount({
+            where: {
+                is_delete: 0
+            }
         })
+
+        return {
+            data,
+            count: dataCount[0].count
+        }
     }
 
     /**
@@ -39,7 +49,22 @@ class TagCategoryService {
      * @param {number[]} deleteId id数组
      */
     deleteCategory(deleteId) {
-        return this.categoryModel.delete(deleteId);
+        return this.categoryModel.update({
+            set: {
+                is_delete: 1
+            },
+            where: {
+                id: deleteId
+            }
+        });
+    }
+
+    /**
+     * @method getCategoryInfo 获取详细信息
+     * @param {Number} id 
+     */
+    getCategoryInfo(id) {
+        return this.categoryModel.findById(id)
     }
 }
 

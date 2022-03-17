@@ -93,7 +93,6 @@ const loader = (app, root, options) => {
                         applyUrl(`${modifiedUrl}/index`);
                     }
                 } else {
-                    console.log(method)
                     throw Error('[load-router]: invalid method: ' + method);
                 }
             }
