@@ -79,7 +79,7 @@ exports.getInfo = [
         path: "category/:id",
         handle: async (req, res) => {
             let returnData = await categoryTagService.getCategoryInfo(req.params.id);
-            if (returnData) {
+            if (returnData.length != 0) {
                 res.send({
                     data: returnData[0],
                     status: true
@@ -119,9 +119,42 @@ exports.delete = [
 /**
  * @method update 更新标签或文章
  */
-exports.update = {
-    method: "PUT",
-    handle: async (req, res) => {
-
+exports.update = [
+    {
+        method: "PUT",
+        path: "category",
+        handle: async (req, res) => {
+            try {
+                let status = await categoryTagService.updateCategory(req.body);
+                console.log(status)
+                if(status) {
+                    res.send({
+                        status: true,
+                        data: "更新成功!"
+                    })
+                }else {
+                    res.send({
+                        status: false,
+                        data: "更新失败"
+                    })
+                }
+            } catch (e) {
+                console.log(e)
+                res.send({
+                    status: false,
+                    data: e.toString
+                })
+            }
+        }
+    },
+    {
+        method: "PUT",
+        path: "tag",
+        handle: async (req, res) => {
+            console.log(req.body);
+            res.send({
+                status: true
+            })
+        }
     }
-}
+]

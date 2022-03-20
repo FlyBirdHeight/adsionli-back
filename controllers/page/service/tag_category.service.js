@@ -66,6 +66,26 @@ class TagCategoryService {
     getCategoryInfo(id) {
         return this.categoryModel.findById(id)
     }
+
+    /**
+     * @method updateCategory 更新数据信息
+     * @param {*} data
+     */
+    updateCategory(data) {
+        Reflect.has(data, 'created_at') && Reflect.deleteProperty(data, 'created_at');
+        Reflect.has(data, 'updated_at') && Reflect.deleteProperty(data, 'updated_at');
+        if (!Reflect.has(data, 'id')) {
+            throw new Error('id未传入')
+        }
+        let id = data.id;
+        Reflect.deleteProperty(data, 'id');
+        return this.categoryModel.update({
+            set: data,
+            where: {
+                id: id
+            }
+        })
+    }
 }
 
 export default TagCategoryService;
