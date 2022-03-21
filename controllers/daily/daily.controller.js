@@ -1,3 +1,19 @@
+import DailyService from "./service/daily.service"
+const dailyService = new DailyService();
+/**
+ * @method get 获取日程列表
+ */
+exports.get = {
+    method: "GET",
+    handle: async (req, res) => {
+        console.log(req.query);
+        dailyService.getDailyInfo(req.query);
+        res.send({
+            status: true
+        })
+    }
+}
+
 /**
  * @method create 创建日程
  */

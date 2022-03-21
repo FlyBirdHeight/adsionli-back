@@ -9,7 +9,7 @@ class UpdateValueError extends ApplicationError {
     }
 
     get statusCode() {
-        return 1122;
+        return 1121;
     }
 }
 
