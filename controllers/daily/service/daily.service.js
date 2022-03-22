@@ -10,9 +10,17 @@ class DailyService {
      * @param {*} data 包含有月份年份的信息
      */
     getDailyInfo(data) {
-        const date = new Date(data.year, Number(data.month), 0);
-        let start = `${data.year}-${data.month < 10 ? `0${data.month}` : data.month}-01`;
-        let end = `${data.year}-${data.month < 10 ? `0${data.month}` : data.month}-${date.getDate()}`;
+        let start = null;
+        let end = null;
+        if (data.py == data.ny && data.pm == data.nm) {
+            const date = new Date(data.py, Number(data.pm), 0);
+            start = `${data.py}-${data.pm < 10 ? `0${data.pm}` : data.pm}-01`;
+            end = `${data.py}-${data.pm < 10 ? `0${data.pm}` : data.pm}-${date.getDate()}`;
+        }else {
+            const date = new Date(data.ny, Number(data.nm), 0);
+            start = `${data.py}-${data.pm < 10 ? `0${data.pm}` : data.pm}-01`;
+            end = `${data.ny}-${data.nm < 10 ? `0${data.nm}` : data.nm}-${date.getDate()}`
+        }
         return this.dailyModel.find({
             where: {
                 _link: 'or',
