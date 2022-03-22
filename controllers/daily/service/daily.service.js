@@ -13,12 +13,30 @@ class DailyService {
         const date = new Date(data.year, Number(data.month), 0);
         let start = `${data.year}-${data.month < 10 ? `0${data.month}` : data.month}-01`;
         let end = `${data.year}-${data.month < 10 ? `0${data.month}` : data.month}-${date.getDate()}`;
-        console.log(start, end);
-        // return this.dailyModel.find({
-        //     where: {
-
-        //     }
-        // })
+        return this.dailyModel.find({
+            where: {
+                _link: 'or',
+                start_time: {
+                    type: 'between',
+                    data: [start, end]
+                },
+                end_time: {
+                    type: 'between',
+                    data: [start, end]
+                },
+                _brackets: {
+                    _link: "and",
+                    start_time: {
+                        type: "<=",
+                        data: start
+                    },
+                    end_time: {
+                        type: ">=",
+                        data: end
+                    }
+                }
+            }
+        })
     }
 }
 

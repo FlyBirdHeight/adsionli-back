@@ -6,11 +6,19 @@ const dailyService = new DailyService();
 exports.get = {
     method: "GET",
     handle: async (req, res) => {
-        console.log(req.query);
-        dailyService.getDailyInfo(req.query);
-        res.send({
-            status: true
-        })
+        try {
+            let data = await dailyService.getDailyInfo(req.query);
+            res.send({
+                status: true,
+                data: data
+            })
+        } catch (e) {
+            res.send({
+                status: false,
+                data: e.toString ? e.toString : e.message
+            })
+        }
+
     }
 }
 
