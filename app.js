@@ -43,5 +43,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 app.listen(3000, '0.0.0.0', console.log("application is start at port 3000"))
 export default app;

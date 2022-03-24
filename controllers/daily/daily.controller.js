@@ -28,7 +28,10 @@ exports.get = {
 exports.create = {
     method: "POST",
     handle: async (req, res) => {
-
+        console.log(req.body)
+        res.send({
+            status: true
+        })
     }
 }
 /**
