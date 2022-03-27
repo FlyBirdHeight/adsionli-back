@@ -1,0 +1,245 @@
+export default function dailySetting(data) {
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
+            <title>日程设置成功</title>
+            <style>
+                .email_warp {
+                    height: 100vh;
+                    min-height: 500px;
+                    font-size: 14px;
+                    color: #212121;
+                    margin: auto;
+                    text-align: center;
+                    padding-left: 10%;
+                    padding-right: 10%;
+                }
+
+                .email_warp .log {
+                    display: flex;
+                    justify-content: center;
+                }
+
+                .email_warp .body {
+                    text-align: left;
+                    padding-left: 30px;
+                    padding-right: 30px;
+                }
+
+                .email_warp .body .daily_table {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, calc(100% /3));
+                    grid-template-rows: 75px 75px;
+                }
+
+                .email_warp .body .daily_table div {
+                    border: 1px solid #909399;
+                    margin-left: -1px;
+                    margin-top: -1px;
+                    text-align: center;
+                    font-weight: 600;
+                    font-size: 15px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .email_warp .body .target {
+                    font-weight: 600;
+                    font-size: 15px;
+                    text-align: unset;
+                    padding: 5px;
+                    line-height: unset;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    border: 1px solid #909399;
+                    margin-top: -1px;
+                    margin-left: -1px;
+                    margin-right: 0px;
+                }
+
+                .email_warp .body .target p {
+                    margin-block-start: 0;
+                    margin-block-end: 0;
+                }
+
+                .email_warp .body .target .target-info {
+                    font-size: 14px;
+                    font-weight: 400;
+                    text-indent: 2ch;
+                }
+
+                font.label,
+                p.label {
+                    color: #909399
+                }
+
+                font.label-item,
+                p.target-info {
+                    color: #606266
+                }
+
+                .email_warp .body .footer {
+                    margin-top: 20px;
+                    text-align: left;
+                    font-size: 18px;
+                    font-weight: 800;
+                    color: #67C23A;
+                }
+
+                .email_warp .body .other_daily {
+                    width: 100%;
+                    max-height: 500px;
+                    overflow-x: scroll;
+                    overflow-y: scroll;
+                }
+
+                .email_warp .body .other_daily table {
+                    width: 100%;
+                    border-collapse: collapse;
+
+                }
+
+                th.th_body,
+                td.td_body {
+                    border: 1px solid #A8ABB2;
+                    height: 60px;
+                    text-align: center;
+                }
+
+                thead tr.thead_title {
+                    font-weight: 800;
+                    font-size: 17px;
+                }
+
+                td.td_body.td_target {
+                    text-align: left;
+                    text-indent: 2ch;
+                }
+
+                div.divide {
+                    margin: 15px 0;
+                    border-top: 1px dashed #A8ABB2;
+                }
+            </style>
+        </head>
+
+        <body>
+            <section class="email_warp">
+                <div class="log">
+                    <img src="https://adsionli.xslease.com/image/adsionli.jpeg" style="width: 100%;max-width: 500px;" alt="adsionli后端管理">
+                </div>
+                <div class="body">
+                    <h1 class="email-title">
+                        嗨！${data.creator}:
+                    </h1>
+                    <p>您新添加的日程已经创建成功啦！</p>
+                    <p>具体日程如下:</p>
+                    <div class="daily_table">
+                        <div class="creator">
+                            <section>
+                                <font class="label">创建人:</font>
+                                <font class="label-item">${data.creator}</font>
+                            </section>
+                        </div>
+                        <div class="start_time">
+                            <font class="label">开始时间:</font>
+                            <font class="label-item">${data.start_time}</font>
+                        </div>
+                        <div class="end_time">
+                            <font class="label">结束时间:</font>
+                            <font class="label-item">${data.endTime}</font>
+                        </div>
+                        <div class="type">
+                            <section>
+                                <font class="label">日程类型:</font>
+                                <font class="label-item">${data.type}</font>
+                            </section>
+                        </div>
+                        <div class="status">
+                            <section>
+                                <font class="label">日程状态:</font>
+                                <font class="label-item">${data.status}</font>
+                            </section>
+                        </div>
+                        <div class="sned_email">
+                            <section>
+                                <font class="label">邮件通知:</font>
+                                <font class="label-item">${data.send_email}</font>
+                            </section>
+                        </div>
+                    </div>
+                    <div class="target">
+                        <p class="label">日程内容:</p>
+                        <p class="target-info">
+                            ${data.target}
+                        </p>
+                    </div>
+                    <div class="footer">
+                        请确保准时完成创建的日程活动，避免发生延期，乌拉！
+                    </div>
+                    <div class="divide"></div>
+
+                    <h1>其他正在进行中日程</h1>
+                    <div class="other_daily">
+                        <table>
+                            <thead>
+                                <tr class="thead_title">
+                                    <th class="th_body" style="min-width: 220px;">内容</th>
+                                    <th class="th_body" style="min-width: 120px;">起始时间</th>
+                                    <th class="th_body" style="min-width: 120px;">结束时间</th>
+                                    <th class="th_body" style="min-width: 120px;">类型</th>
+                                    <th class="th_body" style="min-width: 120px;">状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${
+                                    (() => {
+                                        if(data.runningList.length == 0){
+                                            return `
+                                                <tr>
+                                                    <td class="td_body" colspan="5">
+                                                        暂无进行中日程
+                                                    </td>
+                                                </tr>
+                                            `
+                                        }else {
+                                            let returnData = '';
+                                            for(let v of data.runningList){
+                                                returnData += `
+                                                    <tr>
+                                                        <td class="td_body td_target">${v.target}</td>
+                                                        <td class="td_body">${v.start_time}</td>
+                                                        <td class="td_body">${v.end_time}</td>
+                                                        <td class="td_body">${v.type}</td>
+                                                        <td class="td_body">${v.status}</td>
+                                                    </tr>
+                                                `
+                                            }
+
+                                            return returnData;
+                                        }
+                                    })()
+                                }
+                                
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="divide"></div>
+                    <div class="footer" style="padding: 20px 0">
+                        加油完成自己创建的日程规划，做一个自律的人可以让生活更加美好，冲冲冲！
+                    </div>
+                </div>
+
+            </section>
+        </body>
+
+        </html>
+    `
+}

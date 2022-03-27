@@ -18,6 +18,11 @@
             padding-right: 10%;
         }
 
+        .email_warp .log {
+            display: flex;
+            justify-content: center;
+        }
+
         .email_warp .body {
             text-align: left;
             padding-left: 30px;
@@ -37,6 +42,9 @@
             text-align: center;
             font-weight: 600;
             font-size: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .email_warp .body .target {
@@ -73,13 +81,56 @@
         p.target-info {
             color: #606266
         }
+
+        .email_warp .body .footer {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 18px;
+            font-weight: 800;
+            color: #67C23A;
+        }
+
+        .email_warp .body .other_daily {
+            width: 100%;
+            max-height: 500px;
+            overflow-x: scroll;
+            overflow-y: scroll;
+        }
+
+        .email_warp .body .other_daily table {
+            width: 100%;
+            border-collapse: collapse;
+
+        }
+
+        th.th_body,
+        td.td_body {
+            border: 1px solid #A8ABB2;
+            height: 60px;
+            text-align: center;
+        }
+
+        thead tr.thead_title {
+            font-weight: 800;
+            font-size: 17px;
+        }
+
+        td.td_body.td_target {
+            text-align: left;
+            text-indent: 2ch;
+        }
+
+        div.divide {
+            margin: 15px 0;
+            border-top: 1px dashed #A8ABB2;
+        }
     </style>
 </head>
 
 <body>
     <section class="email_warp">
         <div class="log">
-            <img src="" alt="adsionli后端管理">
+            <img src="https://adsionli.xslease.com/image/adsionli.jpeg" style="width: 100%;max-width: 500px;" alt="adsionli后端管理">
         </div>
         <div class="body">
             <h1 class="email-title">
@@ -89,22 +140,36 @@
             <p>具体日程如下:</p>
             <div class="daily_table">
                 <div class="creator">
-                    <font class="label">创建人:</font><font class="label-item">adsionli</font>
+                    <section>
+                        <font class="label">创建人:</font>
+                        <font class="label-item">adsionli</font>
+                    </section>
                 </div>
                 <div class="start_time">
-                    <font class="label">开始时间:</font><font class="label-item">2022-03-25</font>
+                    <font class="label">开始时间:</font>
+                    <font class="label-item">2022-03-25</font>
                 </div>
                 <div class="end_time">
-                    <font class="label">结束时间:</font><font class="label-item">2022-03-25</font>
+                    <font class="label">结束时间:</font>
+                    <font class="label-item">2022-03-25</font>
                 </div>
                 <div class="type">
-                    <font class="label">日程类型:</font><font class="label-item">普通事件</font>
+                    <section>
+                        <font class="label">日程类型:</font>
+                        <font class="label-item">普通事件</font>
+                    </section>
                 </div>
                 <div class="status">
-                    <font class="label">日程状态:</font><font class="label-item">未确认</font>
+                    <section>
+                        <font class="label">日程状态:</font>
+                        <font class="label-item">未确认</font>
+                    </section>
                 </div>
                 <div class="sned_email">
-                    <font class="label">邮件通知:</font><font class="label-item">发送</font>
+                    <section>
+                        <font class="label">邮件通知:</font>
+                        <font class="label-item">发送</font>
+                    </section>
                 </div>
             </div>
             <div class="target">
@@ -112,6 +177,43 @@
                 <p class="target-info">
                     完成email模块内容开发
                 </p>
+            </div>
+            <div class="footer">
+                请确保准时完成创建的日程活动，避免发生延期，乌拉！
+            </div>
+            <div class="divide"></div>
+
+            <h1>其他正在进行中日程</h1>
+            <div class="other_daily">
+                <table>
+                    <thead>
+                        <tr class="thead_title">
+                            <th class="th_body" style="min-width: 220px;">内容</th>
+                            <th class="th_body" style="min-width: 120px;">起始时间</th>
+                            <th class="th_body" style="min-width: 120px;">结束时间</th>
+                            <th class="th_body" style="min-width: 120px;">类型</th>
+                            <th class="th_body" style="min-width: 120px;">状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="td_body td_target">完成email模块内容开发</td>
+                            <td class="td_body">2022-03-25</td>
+                            <td class="td_body">2022-03-25</td>
+                            <td class="td_body">普通事件</td>
+                            <td class="td_body">进行中</td>
+                        </tr>
+                        <tr>
+                            <td class="td_body" colspan="5">
+                                暂无进行中日程
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="divide"></div>
+            <div class="footer" style="padding:20px 0">
+                加油完成自己创建的日程规划，做一个自律的人可以让生活更加美好，冲冲冲！
             </div>
         </div>
 
