@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>日程设置成功</title>
+    <style>
+        .email_warp {
+            height: 100vh;
+            min-height: 500px;
+            font-size: 14px;
+            color: #212121;
+            margin: auto;
+            text-align: center;
+            padding-left: 10%;
+            padding-right: 10%;
+        }
+
+        .email_warp .body {
+            text-align: left;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        .email_warp .body .daily_table {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, calc(100% /3));
+            grid-template-rows: 75px 75px;
+        }
+
+        .email_warp .body .daily_table div {
+            border: 1px solid #909399;
+            margin-left: -1px;
+            margin-top: -1px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .email_warp .body .target {
+            font-weight: 600;
+            font-size: 15px;
+            text-align: unset;
+            padding: 5px;
+            line-height: unset;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border: 1px solid #909399;
+            margin-top: -1px;
+            margin-left: -1px;
+            margin-right: 0px;
+        }
+
+        .email_warp .body .target p {
+            margin-block-start: 0;
+            margin-block-end: 0;
+        }
+
+        .email_warp .body .target .target-info {
+            font-size: 14px;
+            font-weight: 400;
+            text-indent: 2ch;
+        }
+
+        font.label,
+        p.label {
+            color: #909399
+        }
+
+        font.label-item,
+        p.target-info {
+            color: #606266
+        }
+    </style>
+</head>
+
+<body>
+    <section class="email_warp">
+        <div class="log">
+            <img src="" alt="adsionli后端管理">
+        </div>
+        <div class="body">
+            <h1 class="email-title">
+                嗨！adsionli:
+            </h1>
+            <p>您新添加的日程已经创建成功啦！</p>
+            <p>具体日程如下:</p>
+            <div class="daily_table">
+                <div class="creator">
+                    <font class="label">创建人:</font><font class="label-item">adsionli</font>
+                </div>
+                <div class="start_time">
+                    <font class="label">开始时间:</font><font class="label-item">2022-03-25</font>
+                </div>
+                <div class="end_time">
+                    <font class="label">结束时间:</font><font class="label-item">2022-03-25</font>
+                </div>
+                <div class="type">
+                    <font class="label">日程类型:</font><font class="label-item">普通事件</font>
+                </div>
+                <div class="status">
+                    <font class="label">日程状态:</font><font class="label-item">未确认</font>
+                </div>
+                <div class="sned_email">
+                    <font class="label">邮件通知:</font><font class="label-item">发送</font>
+                </div>
+            </div>
+            <div class="target">
+                <p class="label">日程内容:</p>
+                <p class="target-info">
+                    完成email模块内容开发
+                </p>
+            </div>
+        </div>
+
+    </section>
+</body>
+
+</html>

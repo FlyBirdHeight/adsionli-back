@@ -46,6 +46,14 @@ class DailyService {
             }
         })
     }
+
+    /**
+     * @method insertDailySetting 添加日程数据
+     * @param {*} form 日程数据
+     */
+    insertDailySetting(form){
+        console.log(form)
+    }
 }
 
 export default DailyService;

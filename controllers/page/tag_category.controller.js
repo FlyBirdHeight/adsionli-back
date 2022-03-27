@@ -21,6 +21,7 @@ exports.create = [
                     status: true
                 })
             } catch (e) {
+                console.log(e.toString)
                 res.status(400).send({
                     message: e.message
                 })

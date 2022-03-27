@@ -1,6 +1,7 @@
 import { loader } from './load_route.js';
 //这里需要将database类挂载在全局对象下，以便查找
 import Database from "./modules/database/mysql.js"
+import { registerListener } from "./events/index.js"
 const database = new Database();
 global.database = database;
 //因为使用了node的版本大于14,所以需要手动导入require才可以使用CommonJs模块引用
@@ -27,6 +28,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(path.resolve(), 'public')));
 
 loadRoute(app, path.join(path.resolve(), 'controllers'));
+global.event = registerListener(path.join(path.resolve(), 'events'))
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -43,6 +45,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 app.listen(3000, '0.0.0.0', console.log("application is start at port 3000"))
 export default app;

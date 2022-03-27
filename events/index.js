@@ -1,121 +1,51 @@
-class Event {
-    constructor() {
-        /**
-         * @property {Map} eventList 监听列表
-         */
-        this.eventList = new Map();
-    }
+'use strict'
+import glob from "glob";
+import fs from "fs";
+import Event from "../lib/Event.js"
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const eventHandle = new Event();
 
-    /**
-     * @method addEventListener 添加新的监听事件
-     * @param {string} name 事件名称
-     * @param {Function} callback 事件回调
-     * @param {boolean} head 是否放在第一项执行
-     * @returns {boolean}
-     */
-    addEventListener(name, callback, head = false) {
-        if (this.eventList.has(name)) {
-            if (this.eventList.get(name).length + 1 > 10) {
-                this.printWarning(this.eventList.get(name).length)
+const getEvent = (path) => {
+    let res = [];
+    const fileList = glob.sync(`${path}/*`);
+    for (let value of fileList) {
+        const info = fs.statSync(value);
+        if (info.isDirectory(value)) {
+            res = res.concat(getEvent(value));
+        } else if (info.isFile(value)) {
+            let matchData = value.match(/.+\.event\.js$/gi)
+            if (Array.isArray(matchData) && matchData.length != 0) {
+                res.push(value)
             }
-            let data = this.eventList.get(name);
-            if (head && Array.isArray(data)) {
-                data.unshift(callback);
-            } else if (Array.isArray(data)) {
-                data.push(callback)
-            } else {
-                data = head ? [callback, data] : [data, callback];
-            }
-            this.eventList.set(name, data);
-            return true;
-        }
-        this.eventList.set(name, callback);
-
-        return true;
-    }
-
-    /**
-     * @method removeEventListener 移除监听事件
-     * @param {string} name 事件名称 
-     */
-    removeEventListener(name) {
-        if (!this.eventList.has(name)) {
-            console.error("The listener event does not exist in the current listener factory！")
-            return false;
-        }
-        this.eventList.delete(name);
-        return true;
-    }
-
-    /**
-     * @method removeAllEventListener 清除全部监听事件
-     * @returns {boolean}
-     */
-    removeAllEventListener() {
-        this.eventList.clear();
-        return true;
-    }
-
-    /**
-     * @method getEventCount 获取当前监听事件中的数量
-     * @return {number}
-     */
-    getEventCount() {
-        return this.eventList.size();
-    }
-
-    /**
-     * @method getEventList 获取当前监听事件中的事件列表
-     * @return {Array}
-     */
-    getEventList() {
-        let list = [];
-        this.eventList.forEach((v, k) => {
-            list.push(k)
-        })
-
-        return list;
-    }
-
-    /**
-     * @method emit 执行事件
-     * @param {string} name  
-     * @param {*} args 
-     */
-    emit(name, ...args) {
-        if (!this.eventList.has(name)) {
-            console.error("The current listening event is not exist!")
-            return false;
-        }
-        let callback = this.eventList.get(name);
-        if (Array.isArray(callback)) {
-            for (let func of callback) {
-                func.apply(null, ...args);
-            }
-        } else {
-            callback.apply(null, ...args);
         }
     }
 
-    /**
-     * @method printWarning 当监听事件内回调函数超过10个的时候，发出警告
-     * @param {number} length 
-     */
-    printWarning(length) {
-        console.warn(`The current listening event has more than 10, which is ${length}, please ensure that the event does not exceed 10 callback function execution`)
-    }
-
-    get off(name) {
-        return this.removeEventListener(name);
-    }
-
-    get on(name, callback) {
-        return this.addEventListener(name, callback);
-    }
-
-    get prependListener(name, callback) {
-        return this.addEventListener(name, callback, true);
-    }
+    return res;
 }
 
-export default Event;
+const registerListener = (path) => {
+    let eventList = getEvent(path);
+    if (eventList.length != 0) {
+        for (let event of eventList) {
+            const filePath = event.replace(/\.[^.]*$/gi, '');
+            let eo = require(filePath);
+            for (let key of Reflect.ownKeys(eo)) {
+                if (Array.isArray(eo[key])) {
+                    eo[key].forEach(v => {
+                        eventHandle.on(key, v)
+                    })
+                } else if (typeof eo[key] === 'function') {
+                    eventHandle.on(key, eo[key])
+                }
+            }
+        }
+    }
+
+    return eventHandle;
+}
+
+export {
+    getEvent,
+    registerListener
+}
