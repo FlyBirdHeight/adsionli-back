@@ -2,17 +2,18 @@ import { loader } from './load_route.js';
 //这里需要将database类挂载在全局对象下，以便查找
 import Database from "./modules/database/mysql.js"
 import { registerListener } from "./events/index.js"
-const database = new Database();
-global.database = database;
-//因为使用了node的版本大于14,所以需要手动导入require才可以使用CommonJs模块引用
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const database = new Database();
+global.database = database;
+global.eventListener = registerListener(path.join(path.resolve(), 'events'))
+//因为使用了node的版本大于14,所以需要手动导入require才可以使用CommonJs模块引用
+
 const loadRoute = loader
 
 var app = express();
@@ -26,9 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(path.resolve(), 'public')));
-
 loadRoute(app, path.join(path.resolve(), 'controllers'));
-global.event = registerListener(path.join(path.resolve(), 'events'))
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

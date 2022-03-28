@@ -1,5 +1,5 @@
 export default function dailySetting(data) {
-    return `
+    let content = `
         <!DOCTYPE html>
         <html lang="en">
 
@@ -11,6 +11,7 @@ export default function dailySetting(data) {
             <style>
                 .email_warp {
                     height: 100vh;
+                    overflow-y: scroll;
                     min-height: 500px;
                     font-size: 14px;
                     color: #212121;
@@ -153,7 +154,7 @@ export default function dailySetting(data) {
                         </div>
                         <div class="end_time">
                             <font class="label">结束时间:</font>
-                            <font class="label-item">${data.endTime}</font>
+                            <font class="label-item">${data.end_time}</font>
                         </div>
                         <div class="type">
                             <section>
@@ -200,7 +201,7 @@ export default function dailySetting(data) {
                             <tbody>
                                 ${
                                     (() => {
-                                        if(data.runningList.length == 0){
+                                        if(!Reflect.has(data, 'runningList')){
                                             return `
                                                 <tr>
                                                     <td class="td_body" colspan="5">
@@ -241,5 +242,9 @@ export default function dailySetting(data) {
         </body>
 
         </html>
-    `
+    `;
+    return {
+        title: "日程创建成功",
+        content
+    }
 }
