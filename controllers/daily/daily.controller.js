@@ -110,16 +110,19 @@ exports.delete = {
 exports.update = {
     method: "PUT",
     handle: async (req, res) => {
-
+        try {
+            let status = await dailyService.updateDaily(req.body);
+            res.send({
+                status: true
+            })
+        }catch(e){
+            console.log(e);
+            res.send({
+                status: false,
+                data: e.message
+            })
+        }
     }
 }
-/**
- * @method ending 完成日程
- */
-exports.ending = {
-    method: "PUT",
-    handle: async (req, res) => {
 
-    }
-}
 

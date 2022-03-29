@@ -111,6 +111,21 @@ class DailyService extends Service {
             throw e;
         }
     }
+
+    /**
+     * @method updateDaily 更新日程
+     * @param {*} data
+     */
+    updateDaily(data) {
+        let id = data.id;
+        Reflect.deleteProperty(data, 'id');
+        return this.dailyModel.update({
+            set: data,
+            where: {
+                id
+            }
+        })
+    }
 }
 
 export default DailyService;
