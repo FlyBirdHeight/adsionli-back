@@ -41,8 +41,6 @@ const handleData = (data) => {
             v.type = type[v.type.toString()];
             v.status = status[v.status.toString()];
             v.send_email = sendMail[v.send_email.toString()];
-            v.start_time = getTime(v.start_time);
-            v.end_time = getTime(v.end_time);
         }
     }
 

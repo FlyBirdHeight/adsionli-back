@@ -8,6 +8,7 @@
     "hot": "nodemon babel-node app"
   },
   "dependencies": {
+    "amqplib": "^0.8.0",
     "babel-cli": "^6.26.0",
     "busboy": "^1.4.0",
     "cookie-parser": "~1.4.4",

@@ -101,7 +101,17 @@ exports.download = {
 exports.delete = {
     method: "DELETE",
     handle: async (req, res) => {
-
+        try {
+            await dailyService.deleteDaily(req.body);
+            res.send({
+                status: true
+            })
+        } catch (e) {
+            res.send({
+                status: false,
+                data: e.toString ? e.toString : e.message
+            })
+        }
     }
 }
 /**
@@ -115,7 +125,7 @@ exports.update = {
             res.send({
                 status: true
             })
-        }catch(e){
+        } catch (e) {
             console.log(e);
             res.send({
                 status: false,

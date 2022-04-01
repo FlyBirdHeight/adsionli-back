@@ -119,11 +119,29 @@ class DailyService extends Service {
     updateDaily(data) {
         let id = data.id;
         Reflect.deleteProperty(data, 'id');
+        Reflect.deleteProperty(data, 'created_at');
+        Reflect.deleteProperty(data, 'updated_at');
+        for (let key of Reflect.ownKeys(data)) {
+            if (!data[key] && data[key] != 0) {
+                Reflect.deleteProperty(data, key)
+            }
+        }
+
         return this.dailyModel.update({
             set: data,
             where: {
                 id
             }
+        })
+    }
+
+    /**
+     * @method deleteDaily 删除日程
+     * @param {*} data
+     */
+    deleteDaily(data) {
+        return this.dailyModel.delete({
+            where: data
         })
     }
 }
