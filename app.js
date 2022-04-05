@@ -1,20 +1,23 @@
 import { loader } from './load_route.js';
 //这里需要将database类挂载在全局对象下，以便查找
 import Database from "./modules/database/mysql.js"
+import * as Mq from "./modules/mq/index.js"
+
 import { registerListener } from "./events/index.js"
+//因为使用了node的版本大于14,所以需要手动导入require才可以使用CommonJs模块引用
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+
 const database = new Database();
 global.database = database;
 global.eventListener = registerListener(path.join(path.resolve(), 'events'))
-//因为使用了node的版本大于14,所以需要手动导入require才可以使用CommonJs模块引用
-
-const loadRoute = loader
+global.mq = Mq.default;
 
 var app = express();
 global.__dirname = path.resolve();
@@ -27,6 +30,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(path.resolve(), 'public')));
+//动态路由生成
+const loadRoute = loader
 loadRoute(app, path.join(path.resolve(), 'controllers'));
 
 // catch 404 and forward to error handler
@@ -46,5 +51,8 @@ app.use(function (err, req, res, next) {
 });
 
 
-app.listen(3000, '0.0.0.0', console.log("application is start at port 3000"))
+app.listen(3000, '0.0.0.0', () => {
+  console.log("项目启动成功，运行端口：3000")
+})
+
 export default app;
