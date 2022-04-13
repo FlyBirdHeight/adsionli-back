@@ -195,8 +195,7 @@ class MqManager {
             let status = await channel.deleteQueue(bindingKey, {
                 ifUnused: true,
                 ifEmpty: true
-            })
-            console.log(status);
+            });
         }, bindingKey, routingKey)
     }
 

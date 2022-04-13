@@ -51,7 +51,7 @@ module.exports = {
         (address, data) => {
             const event = global.eventListener;
             data = handleData(data);
-            event.emit("send_email", [address, data]);
+            event.emit("send_email", [address, data, "DailyCreating"]);
         }
     ]
 }

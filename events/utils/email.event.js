@@ -1,6 +1,6 @@
 import send from "../../modules/email/send.js"
 module.exports = {
-    "send_email": (address, data) => {
-        send(address, data, "DailyCreating");
+    "send_email": (address, data, template) => {
+        send(address, data, template);
     }
 }
