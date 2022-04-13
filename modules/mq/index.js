@@ -1,3 +1,4 @@
+import { register } from "./register.js"
 /**
  * @author adsionli
  * @class MqManager 消息队列管理
@@ -21,6 +22,7 @@ class MqManager {
         this.routingKey = new Map();
         this.bindingKey = new Map();
         this.typeExchange = new Map();
+        this.bindingKeyList = new Set();
         this.dlxInfo = new Map();
         this.init();
         this.connect();
@@ -156,9 +158,28 @@ class MqManager {
      * @method registerQueue 注册消息队列
      * @param {string} bindingKey 绑定寻址名称
      * @param {Object} options 可配置项,主要用来配置持久化、最大消息长度等配置
+     * @param {string} routingKey exchange交换机的路径
      */
-    registerQueue() {
-
+    async registerQueue(bindingKey, options = { durable: true }, routingKey = '') {
+        if (typeof (bindingKey) !== 'string' || bindingKey.replace(/\s/g, '') === '') {
+            throw new Error("Please set a valid bindingKey value!")
+        }
+        if (routingKey !== '') {
+            if (!this.routingKey.has(routingKey)) {
+                throw new Error("Please enter a valid exchange route！");
+            }
+            if (this.bindingKeyList.has(bindingKey)) {
+                throw new Error("The bindingKey of the bindingKey List has been existed, please reset it!");
+            }
+            return await this.handle(async (channel, bindingKey, options = { durable: true }, routingKey = '') => {
+                await channel.assertQueue(bindingKey, options);
+                this.bindingKeyList.add(bindingKey);
+                await this.bindQueueToExchange(channel, bindingKey, routingKey, this.routingKey.get(routingKey));
+                this.bindingKey.get(routingKey).add(bindingKey);
+            }, bindingKey, options, routingKey)
+        } else {
+            throw new Error("Set up a exchange route to bind message queues to the specified exchange!")
+        }
     }
 
     /**
@@ -207,12 +228,16 @@ class MqManager {
                 this.routingKey.delete(routingKey);
                 if (!deleteBinding && binding.size !== 0) {
                     //TODO: 这里做一个并行处理，加速处理，这里实现的功能是变更绑定的exchange交换机
-                    let values = binding.keys();
-                    let promises = values.map(async (v) => {
-                        await this.unBindQueueForExchange(channel, value, routingKey, type);
-                        await this.bindQueueToExchange(channel, value, bindRouting, this.routingKey.get(bindRouting));
+                    let unBindValue = binding.keys();
+                    let bindValue = binding.keys();
+                    let unBind = unBindValue.map(async (value) => {
+                        return await this.unBindQueueForExchange(channel, value, routingKey, type);
                     })
-                    await Promise.all(promises);
+                    await Promise.all(unBind);
+                    let bind = bindValue.map(async (value) => {
+                        return await this.bindQueueToExchange(channel, value, bindRouting, this.routingKey.get(bindRouting));
+                    })
+                    await Promise.all(bind)
                 }
                 await channel.deleteExchange(routingKey);
             } catch (e) {
@@ -287,8 +312,8 @@ class MqManager {
      */
     async exchangeExist(routingKey, channel) {
         try {
+            //NOTE: 这里只要不报错，就代表存在，如果有额外参数的话，会返回
             let status = await channel.checkExchange(routingKey);
-            console.log(status);
             return true;
         } catch (e) {
             console.log(e);
@@ -305,8 +330,8 @@ class MqManager {
      */
     async queueExist(bindingKey, channel) {
         try {
+            //NOTE: 这里只要不报错，就代表存在，如果有额外参数的话，会返回
             let status = await channel.checkQueue(bindingKey);
-            console.log(status);
             return true;
         } catch (e) {
             console.log(e);
@@ -327,5 +352,7 @@ class MqManager {
     }
 
 }
+let mq = new MqManager();
+register.call(mq);
 
-export default new MqManager();
+export default mq;

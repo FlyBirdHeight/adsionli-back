@@ -2,7 +2,6 @@ import { loader } from './load_route.js';
 //这里需要将database类挂载在全局对象下，以便查找
 import Database from "./modules/database/mysql.js"
 import * as Mq from "./modules/mq/index.js"
-
 import { registerListener } from "./events/index.js"
 //因为使用了node的版本大于14,所以需要手动导入require才可以使用CommonJs模块引用
 import { createRequire } from 'module';
