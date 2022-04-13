@@ -27,15 +27,6 @@ class TimerHandle {
         return this;
     }
     /**
-     * @method setThreshold 设置相关阈值
-     * @param {*} threshold 阈值属性
-     */
-    setThreshold(threshold) {
-        this.threshold = threshold;
-
-        return this;
-    }
-    /**
      * @method setTimerTaskForStart 项目启动时设置定时任务
      * @param {*} callback 执行回调方法
      * @param {Number} time 轮询时间
