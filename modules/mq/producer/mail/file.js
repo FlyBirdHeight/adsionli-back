@@ -21,15 +21,22 @@ class FileSendProducer extends Producer {
             template: "",
             address: "",
             data: null,
-            event: "file_setting",
             type: ""
+        }
+        this.queueInfo = {
+            routingKey: "mail",
+            bindingKey: "mail_setting_file",
+            options: {
+                userId: "adsionli",
+                persistent: true,
+            }
         }
     }
     /**
-     * @method setOptions 设置额外数据
+     * @method setData 设置额外数据
      * @param {*} data
      */
-    setOptions(data) {
+    setData(data) {
         this.sendInfo.data = data;
     }
     /**

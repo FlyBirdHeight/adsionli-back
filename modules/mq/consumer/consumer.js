@@ -33,9 +33,9 @@ class Consumer {
                 await this.queueExist(bindingKey, channel);
                 await channel.consume(bindingKey, (msg) => {
                     try {
-                        await fn(msg);
+                        await fn.call(this, msg, channel);
                         channel.ack(msg)
-                    }catch(e){
+                    } catch (e) {
                         console.log(e);
                         channel.nack(msg)
                     }

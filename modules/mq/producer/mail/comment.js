@@ -8,7 +8,7 @@ const TYPE = {
 /**
  * NOTE: 生产者,评论更新时，发送相关邮件,消息队列: mail_setting_comment_notify,交换机: mail(topic)
  */
-class CommentMail extends Producer {
+class CommentMailProducer extends Producer {
     constructor() {
         super('comment_mail');
         /**
@@ -27,8 +27,15 @@ class CommentMail extends Producer {
                 page: "",
                 replyUser: "",
                 comment: "",
-                event: "comment_setting",
                 type: ""
+            }
+        }
+        this.queueInfo = {
+            routingKey: "mail",
+            bindingKey: "mail_setting_comment_notify",
+            options: {
+                userId: "adsionli",
+                persistent: true,
             }
         }
     }
@@ -73,4 +80,4 @@ class CommentMail extends Producer {
     }
 }
 
-export default CommentMail;
+export default CommentMailProducer;

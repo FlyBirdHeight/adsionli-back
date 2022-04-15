@@ -22,6 +22,7 @@ const register = async function () {
     }
 }
 
+
 export {
     register
 };

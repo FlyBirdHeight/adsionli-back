@@ -18,6 +18,7 @@ global.database = database;
 global.eventListener = registerListener(path.join(path.resolve(), 'events'))
 global.mq = Mq.default;
 
+
 var app = express();
 global.__dirname = path.resolve();
 // view engine setup

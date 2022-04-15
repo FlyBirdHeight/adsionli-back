@@ -23,15 +23,22 @@ class DailySendProducer extends Producer {
             template: "",
             address: "",
             data: null,
-            event: "daily_mail",
             type: ""
+        }
+        this.queueInfo = {
+            routingKey: "mail",
+            bindingKey: "mail_setting_daily",
+            options: {
+                userId: "adsionli",
+                persistent: true,
+            }
         }
     }
     /**
-     * @method setOptions 设置额外数据
+     * @method setData 设置额外数据
      * @param {*} data
      */
-    setOptions(data) {
+    setData(data) {
         this.sendInfo.data = data;
         return this;
     }
