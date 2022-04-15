@@ -30,8 +30,7 @@ const send = async (address, data, template) => {
         }
         let content = templateHtml[template](data);
         let option = mailOption(address, content.title, content.content);
-        let status = await transporter.sendMail(option)
-        return status;
+        return transporter.sendMail(option);
     } catch (e) {
         throw e;
     }

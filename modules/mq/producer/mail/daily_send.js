@@ -29,7 +29,6 @@ class DailySendProducer extends Producer {
             routingKey: "mail",
             bindingKey: "mail_setting_daily",
             options: {
-                userId: "adsionli",
                 persistent: true,
             }
         }

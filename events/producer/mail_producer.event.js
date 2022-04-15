@@ -14,7 +14,7 @@ module.exports = {
             let publishData = obj.setAddress(address).setTemplate(type).setData(data).handleDatatoString();
             let { routingKey, bindingKey, options } = obj.queueInfo;
             await obj.sendMessage(routingKey, bindingKey, publishData, options);
-        }catch(e) {
+        } catch (e) {
             console.log(e);
         }
     }

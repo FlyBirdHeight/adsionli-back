@@ -2,37 +2,164 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 var corn = require('node-cron');
 class TimerHandle {
-    constructor(callback = null, time = null) {
-        this.callback = callback;
-        this.time = time;
-        this.timerTask = new Object;
-        this.threshold = undefined;
+    constructor() {
+        this.timerTask = new Map();
+        this.startTask = new Map();
+        this.stopTask = new Map();
+    }
+    /**
+     * @method setTimerTask 设置定时任务
+     * @param {*} options 定时器任务参数，包括执行时间与执行回调
+     */
+    async setTimerTask(options) {
+        try {
+            let doingTime = this.getCornTime(options.time);
+
+            let cornTask = corn.schedule(doingTime, () => {
+                if (typeof (options.callback) != 'function') {
+                    throw new Error('TimeTask is error: callback is not a function！');
+                } else {
+                    options.callback().catch((error) => {
+                        console.log(error)
+                    });
+                }
+            })
+            this.timerTask.set(options.name, {
+                corn: cornTask,
+                config: options
+            })
+            if (options.open) {
+                this.startTask.set(options.name, this.timerTask.get(options.name))
+            } else {
+                await this.taskStop(options.name)
+                this.stopTask.set(options.name, this.timerTask.get(options.name));
+            }
+            return true;
+        } catch (e) {
+            throw e;
+        }
+    }
+    /**
+     * @method taskStop 定时器任务暂停
+     * @param {string[] | string} name 暂停定时器任务名称
+     */
+    taskStop(name) {
+        if (Array.isArray(name)) {
+            let promises = name.map(async (v) => {
+                if (!this.timerTask.has(v)) {
+                    return null;
+                }
+                let timer = this.timerTask.get(v);
+                return await this.timerStop(timer);
+            })
+
+            return Promise.all(promises)
+        }
+        if (!this.timerTask.has(name)) {
+            return null;
+        }
+        let timer = this.timerTask.get(name);
+        return this.timerStop(timer);
     }
 
     /**
-     * @method setCallBack 设置回调参数
-     * @param {*} callback 回调方法
+     * @method timerStop 停止定时器任务
+     * @param {*} timer
      */
-    setCallBack(callback) {
-        this.callback = callback;
-        return this;
+    timerStop(timer) {
+        return new Promise((resolve, reject) => {
+            try {
+                timer.corn.stop();
+                timer.config.open = false;
+                this.stopTask.set(timer.config.name, timer);
+                this.startTask.delete(timer.config.name)
+                resolve(true);
+            } catch (error) {
+                reject(error.message);
+            }
+        })
     }
-    /**
-     * @method setTime 设置回调参数
-     * @param {*} time 轮循时间
-     */
-    setTime(time) {
-        this.time = time;
 
-        return this;
+    /**
+     * @method taskStart 定时器任务开启
+     * @param {string} name 定时器名称
+     */
+    async taskStart(name) {
+        if (Array.isArray(name)) {
+            let promises = name.map(async (v) => {
+                if (!this.timerTask.has(v)) {
+                    return null;
+                }
+                let timer = this.timerTask.get(v);
+                return await this.timerStart(timer);
+            })
+
+            return Promise.all(promises)
+        }
+        if (!this.timerTask.has(name)) {
+            return null;
+        }
+        let timer = this.timerTask.get(name);
+        return this.timerStart(timer);
     }
     /**
-     * @method setTimerTaskForStart 项目启动时设置定时任务
-     * @param {*} callback 执行回调方法
-     * @param {Number} time 轮询时间
-     * @param {*} threshold 阈值设置
+     * @method timerStart 开启定时器
+     * @param {*} timer 等待开启的定时器
      */
-    setTimerTaskForStart(callback, time, threshold) {
+    timerStart(timer) {
+        return new Promise((resolve, reject) => {
+            try {
+                timer.corn.start();
+                timer.config.open = true;
+                this.startTask.set(timer.config.name, timer);
+                this.stopTask.delete(timer.config.name)
+                resolve(true);
+            } catch (error) {
+                reject(error.message);
+            }
+        })
+    }
+    /**
+     * @method deleteTask 删除定时器任务
+     * @param {string | string[]} name 定时器任务名称 
+     */
+    async deleteTask(name) {
+        try {
+            const hd = async (task) => {
+                if (!this.timerTask.has(task)) {
+                    return;
+                }
+                let timer = this.timerTask.get(task);
+                if (timer.config.open) {
+                    await this.timerStop(timer);
+                }
+                this.timerTask.delete(task);
+                this.startTask.delete(task);
+                this.stopTask.delete(task);
+                timer = null;
+            }
+            if (Array.isArray(name)) {
+                for (let v of name) {
+                    await hd(v);
+                }
+                return true;
+            }
+
+            await hd(v);
+            return true;
+        } catch (e) {
+            console.log(e);
+            throw e;
+        }
+    }
+
+
+
+    /**
+     * @method getCornTime 获取Corn形式的时间
+     * @param {number} time 秒
+     */
+    getCornTime(time) {
         let second = undefined;
         let minute = undefined;
         let hour = undefined;
@@ -46,7 +173,7 @@ class TimerHandle {
             second = time % 60;
             hour = Math.floor(time / 3600);
             minute = Math.floor((time - hour * 3600) / 60);
-            doingTIme = `${second} ${minute} */${hour} * * *`;
+            doingTime = `${second} ${minute} */${hour} * * *`;
         } else if (time > 86400) {
             second = time % 60;
             day = Math.floor(time / 86400);
@@ -56,100 +183,8 @@ class TimerHandle {
         } else {
             doingTime = `*/${time} * * * * *`
         }
-        this.timerTask['task'] = corn.schedule(doingTime, () => {
-            if (typeof (callback) != 'function') {
-                throw new Error('TimeTask is error: callback is not a function！');
-            } else {
-                callback(threshold).then((res) => {
-                    console.log('select data is success, please set in socket to web!');
-                }).catch((error) => {
-                    console.log(error)
-                });
-            }
-        })
-        this.timerTask['status'] = 'running';
 
-        return true;
-    }
-    /**
-     * @method setTimerTask 设置定时任务
-     */
-    setTimerTask() {
-        let second = undefined;
-        let minute = undefined;
-        let hour = undefined;
-        let day = undefined;
-        let doingTime = '';
-        if (this.time > 59 && this.time < 3601) {
-            second = this.time % 60;
-            minute = Math.floor(this.time / 60);
-            doingTime = `${second} */${minute} * * * *`;
-        } else if (this.time > 3600 && this.time < 86401) {
-            second = this.time % 60;
-            hour = Math.floor(this.time / 3600);
-            minute = Math.floor((this.time - hour * 3600) / 60);
-            doingTIme = `${second} ${minute} */${hour} * * *`;
-        } else if (this.time > 86400) {
-            second = this.time % 60;
-            day = Math.floor(this.time / 86400);
-            hour = Math.floor((this.time - day * 86400) / 3600);
-            minute = Math.floor((this.time - day * 86400 - hour * 3600) / 60);
-            doingTime = `${second} ${minute} ${hour} */${day} * *`
-        } else {
-            doingTime = `*/${this.time} * * * * *`
-        }
-        this.timerTask['task'] = corn.schedule(doingTime, () => {
-            if (typeof (this.callback) != 'function') {
-                throw new Error('TimeTask is error: callback is not a function！');
-            } else {
-                this.callback(this.threshold).then((res) => {
-                    console.log(res);
-                    console.log('select data is success, please set in socket to web!');
-                }).catch((error) => {
-                    console.log(error)
-                });
-            }
-        })
-        this.timerTask['status'] = 'running';
-
-        return true;
-    }
-    /**
-     * @method taskStop 定时器任务暂停
-     */
-    taskStop() {
-        return new Promise((resolve, reject) => {
-            try {
-                if (this.timerTask['status'] == 'stop') {
-                    reject('Task has been stopped！');
-                } else {
-                    this.timerTask['task'].stop();
-                    this.timerTask['status'] = 'stop';
-                    resolve(true);
-                }
-
-            } catch (error) {
-                reject(error.message);
-            }
-        })
-    }
-    /**
-     * @method taskStart 定时器任务开启
-     */
-    taskStart() {
-        return new Promise((resolve, reject) => {
-            try {
-                if (this.timerTask['status'] == 'stop') {
-                    this.timerTask['task'].start();
-                    this.timerTask['status'] = 'running';
-                    resolve(true)
-                } else {
-                    reject('Task has been started！');
-                }
-            } catch (error) {
-                reject(error.message)
-            }
-        })
+        return doingTime;
     }
 }
 

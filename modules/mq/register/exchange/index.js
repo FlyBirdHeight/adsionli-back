@@ -4,28 +4,28 @@
 
 const exchange = [
     {
-        routingKey: "mail",
-        type: "topic",
-        options: {
-            durable: true
-        }
-    },
-    {
-        routingKey: "page",
+        name: "mail",
         type: "direct",
         options: {
             durable: true
         }
     },
     {
-        routingKey: "daily",
+        name: "page",
         type: "direct",
         options: {
             durable: true
         }
     },
     {
-        routingKey: "file",
+        name: "daily",
+        type: "direct",
+        options: {
+            durable: true
+        }
+    },
+    {
+        name: "file",
         type: "direct",
         options: {
             durable: true

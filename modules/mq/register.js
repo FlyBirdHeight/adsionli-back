@@ -4,7 +4,7 @@ import queue from "./register/queue/index.js"
 const register = async function () {
     try {
         let registerExchange = exchange.map(async v => {
-            return await this.registerExchange(v.routingKey, v.type, v.options)
+            return await this.registerExchange(v.name, v.type, v.options)
         })
         let exchangeRegisterStatus = await Promise.all(registerExchange);
         if (exchangeRegisterStatus.length !== exchange.length) {
@@ -12,7 +12,7 @@ const register = async function () {
         }
 
         let registerQueue = queue.map(async v => {
-            return await this.registerQueue(v.bindingKey, v.options, v.routingKey);
+            return await this.registerQueue(v.queueName, v.options, v.exchangeName);
         })
         let queueRegisterStatus = await Promise.all(registerQueue);
 

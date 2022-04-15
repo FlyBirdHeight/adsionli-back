@@ -13,41 +13,46 @@ class Consumer {
     constructor(consumer) {
         this.mq = global.mq;
         this.consumer = consumer;
+        this.maxConsumerCount = 20;
     }
     /**
      * @method consumerData 消费数据
      * @param {*} fn 消费数据的执行方法
-     * README: 如果是在一个topic下的exchange的话，那就可以传入一个模糊的bindingKey，这样就可以通配好几个消息队列了
-     * @param {string} bindingKey 绑定消息队列的key
+     * README: 如果是在一个topic下的exchange的话，那就可以传入一个模糊的队列名称，这样就可以通配好几个消息队列了
+     * @param {string} queueName 绑定消息队列的key
      * @param {*} options 额外携带参数
      */
-    async consumerData(fn, bindingKey, options = {}) {
-        if (typeof fn !== 'function') {
-            throw new ConsumerError("", {
-                consumer: this.consumer,
-                error: `The callback function parameter of consumer consumption is not a function object！`
-            })
-        }
-        return await this.mq.handle(async (channel, fn, bindingKey, options = {}) => {
-            try {
-                await this.queueExist(bindingKey, channel);
-                await channel.consume(bindingKey, (msg) => {
-                    try {
-                        await fn.call(this, msg, channel);
-                        channel.ack(msg)
-                    } catch (e) {
-                        console.log(e);
-                        channel.nack(msg)
-                    }
-                }, options)
-            } catch (e) {
-                console.log(e);
+    async consumerData(fn, queueName, options = {}) {
+        try {
+            if (!this.mq) {
+                this.mq = global.mq;
+            }
+            if (typeof fn !== 'function') {
                 throw new ConsumerError("", {
                     consumer: this.consumer,
-                    error: e
+                    error: `The callback function parameter of consumer consumption is not a function object！`
                 })
             }
-        }, fn, bindingKey, options);
+            let channel = await this.mq.createChannel();
+            //NOTE: 这里设置了最大连接数，保证不会超时
+            await channel.prefetch(this.maxConsumerCount, false);
+            //NOTE: 判断当前队列是否存在
+            await this.mq.queueExist(queueName, channel);
+            //NOTE: 开始消费队列内容
+            await channel.consume(queueName, async (msg) => {
+                try {
+                    await fn(msg, channel);
+                    await channel.ack(msg)
+                } catch (e) {
+                    await channel.nack(msg)
+                }
+            }, options)
+        } catch (e) {
+            throw new ConsumerError("", {
+                consumer: this.consumer,
+                error: e
+            })
+        }
     }
 }
 

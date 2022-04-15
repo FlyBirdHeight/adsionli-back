@@ -1,7 +1,7 @@
 const queue = [
     {
-        routingKey: "mail",
-        bindingKey: "mail_setting_daily",
+        exchangeName: "mail",
+        queueName: "mail_setting_daily",
         options: {
             durable: true,
             argument: {
@@ -10,8 +10,8 @@ const queue = [
         }
     },
     {
-        routingKey: "mail",
-        bindingKey: "mail_setting_file",
+        exchangeName: "mail",
+        queueName: "mail_setting_file",
         options: {
             durable: true,
             argument: {
@@ -20,8 +20,8 @@ const queue = [
         }
     },
     {
-        routingKey: "mail",
-        bindingKey: "mail_setting_comment_notify",
+        exchangeName: "mail",
+        queueName: "mail_setting_comment_notify",
         options: {
             durable: true,
             argument: {
@@ -30,8 +30,8 @@ const queue = [
         }
     },
     {
-        routingKey: "page",
-        bindingKey: "page_update",
+        exchangeName: "page",
+        queueName: "page_update",
         options: {
             durable: true,
             argument: {
@@ -40,8 +40,8 @@ const queue = [
         }
     },
     {
-        routingKey: "daily",
-        bindingKey: "daily_update",
+        exchangeName: "daily",
+        queueName: "daily_update",
         options: {
             durable: true,
             argument: {
@@ -50,8 +50,8 @@ const queue = [
         }
     },
     {
-        routingKey: "file",
-        bindingKey: "file_update",
+        exchangeName: "file",
+        queueName: "file_update",
         options: {
             durable: true,
             argument: {

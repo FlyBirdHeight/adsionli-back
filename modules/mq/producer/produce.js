@@ -22,30 +22,34 @@ class Producer {
 
     /**
      * @method sendMessage 向消息队列发信
-     * @param {string} routingKey 交换机路由
-     * @param {string} bindingKey 绑定交换机的消息队列
+     * @param {string} exchangeName 交换机路由
+     * @param {string} queueName 绑定交换机的消息队列
      * @param {string} data 传输的数据,这里需要先转成字符串，因为要写入到Buffer对象中去
      * @param {*} options 携带的参数
      * TODO: 这里是做一个强调，一定要注意，data要放入到Buffer在传递过去
      */
-    async sendMessage(routingKey, bindingKey, data, options) {
-        if (!this.mq.routingKey.has(routingKey)) {
+    async sendMessage(exchangeName, queueName, data, options) {
+        if (!this.mq.exchangeList.has(exchangeName)) {
             throw new PublishError("", {
                 producer: this.producer,
-                error: `routingKey is not Exist: ${routingKey}`
+                error: `Exchange is not Exist: ${exchangeName}`
             })
         }
-        if (!this.mq.bindingKey.get(routingKey).has(bindingKey)) {
+        if (!this.mq.exchangeGroup.get(exchangeName).has(queueName)) {
             throw new PublishError("", {
                 producer: this.producer,
-                error: `bingingKey is not Exist: exchange:${routingKey}, queue:${bindingKey}`
+                error: `Queue is not Exist: exchange:${exchangeName}, queue:${queueName}`
             })
         }
-        return await this.mq.handle(async (channel, routingKey, bindingKey, data, options) => {
-            let buf = Buffer.alloc(data.length);
-            buf.write(data, 'utf8');
-            await channel.publish(routingKey, bindingKey, buf, options);
-        }, routingKey, bindingKey, data, options)
+        return await this.mq.handle(async (channel, exchangeName, queueName, data, options) => {
+            try {
+                let buf = Buffer.from(data);
+                await channel.publish(exchangeName, `${exchangeName == '' ? '' : `${exchangeName}/`}${queueName}`, buf, options);
+            } catch (e) {
+                console.log(e);
+                throw e;
+            }
+        }, exchangeName, queueName, data, options)
     }
 }
 

@@ -6,7 +6,7 @@ class MailConsumer extends Consumer {
     constructor() {
         super('MailConsumer');
         this.consumerInfo = {
-            bindingKey: "mail_setting_*",
+            queueName: "mail/mail_setting_*",
             options: {
                 consumerTag: this.consumer
             }
@@ -14,11 +14,11 @@ class MailConsumer extends Consumer {
     }
 
     /**
-     * @method setBindingKey 设置bindingKey，如果这里设置了就不再是通配的了，变成了direct了
-     * @param {*} bindingKey 
+     * @method setQueueName 设置bindingKey，如果这里设置了就不再是通配的了，变成了direct了
+     * @param {*} queueName 
      */
-    setBindingKey(bindingKey) {
-        this.consumerInfo.bindingKey = bindingKey;
+    setQueueName(queueName) {
+        this.consumerInfo.queueName = queueName;
 
         return this;
     }

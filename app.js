@@ -1,23 +1,25 @@
 import { loader } from './load_route.js';
-//这里需要将database类挂载在全局对象下，以便查找
-import Database from "./modules/database/mysql.js"
-import * as Mq from "./modules/mq/index.js"
-import { registerListener } from "./events/index.js"
 //因为使用了node的版本大于14,所以需要手动导入require才可以使用CommonJs模块引用
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+//这里需要将database类挂载在全局对象下，以便查找
+import Database from "./modules/database/mysql.js"
+/**
+ * README: 这里就把我们需要提前挂载或运行的对象实例化出来
+ */
 const database = new Database();
 global.database = database;
+import { registerListener } from "./events/index.js"
 global.eventListener = registerListener(path.join(path.resolve(), 'events'))
+import * as Mq from "./modules/mq/index.js"
 global.mq = Mq.default;
-
+import timerTaskStart from "./modules/timer/start.js"
+timerTaskStart();
 
 var app = express();
 global.__dirname = path.resolve();
