@@ -22,6 +22,9 @@ const update = function (data) {
                 count++;
             }
             sql = this.where(sql, data.where);
+            this.setBucket('update', sql, {
+                data: data
+            });
             return this.database.usePool(this.name, sql);
         } else {
             throw new UpdateError(this.table);

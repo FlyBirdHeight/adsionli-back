@@ -1,10 +1,21 @@
+
+
 /**
 * @method findById 通过id进行寻找
 * @param {*} id 
 */
 const findById = function (id) {
     try {
-        return this.database.usePool(this.name, `select * from ${this.table} where id = ${id} and is_delete = 0`);
+        let sql = `select * from ${this.table} where id = ${id}`;
+        this.setBucket('find_by_id', sql, {
+            data: {
+                id
+            }
+        });        
+        if (!this.judgeJointQuery()) {
+            return this.database.usePool(this.name, sql);
+        }
+        return this.handleJointQuery("find_by_id");
     } catch (e) {
         throw e;
     }
@@ -13,7 +24,7 @@ const findById = function (id) {
 const findOne = function (condition) {
     try {
         condition['one'] = true;
-        return this.select(condition)
+        return this.select(condition, 'find_one')
     } catch (e) {
         throw e
     }
@@ -22,7 +33,7 @@ const findOne = function (condition) {
 const findAll = function (condition) {
     try {
         condition['all'] = true;
-        return this.select(condition)
+        return this.select(condition, 'find_all')
     } catch (e) {
         throw e
     }
@@ -31,7 +42,7 @@ const findAll = function (condition) {
 * @method select 查找数据内容(不包含分页)
 * @param {any} condition 查找条件
 */
-const select = function (condition) {
+const select = function (condition, type = 'find') {
     try {
         let sql = `select ${Reflect.has(condition, 'select') ? condition.select : '*'} from ${Reflect.has(condition, 'table') ? condition.table : this.table}`;
         if (Reflect.has(condition, 'where')) {
@@ -42,12 +53,19 @@ const select = function (condition) {
         }
         if (Reflect.has(condition, 'page') && Reflect.has(condition, 'count')) {
             sql += ` limit ${(condition.page - 1) * condition.count}, ${condition.count}`
-        } else if (Reflect.has(condition, 'one')) {
+        } else if (type == 'find_one') {
             sql += ` limit 1`
-        } else if (Reflect.has(condition, 'all')) {
+        } else if (type == 'find_all') {
             sql += ''
         }
-        return this.database.usePool(this.name, sql)
+        this.setBucket(type, sql, {
+            data: condition
+        });
+
+        if (!this.judgeJointQuery()) {
+            return this.database.usePool(this.name, sql);
+        }
+        return this.handleJointQuery(type);
     } catch (e) {
         throw e;
     }
@@ -61,7 +79,7 @@ const getCount = function (condition) {
     try {
         condition['select'] = 'count(*)'
 
-        return this.select(condition)
+        return this.select(condition, 'get_count')
     } catch (e) {
         throw e;
     }

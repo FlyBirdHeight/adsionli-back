@@ -1,6 +1,8 @@
 import fs from "fs";
 import readline from "readline";
 import iconv from "iconv-lite"
+import FileService from "./service/file.service.js"
+const fileService = new FileService();
 var returnData = [];
 String.prototype.toBytes = function (encoding) {
     var buff = Buffer.from(this, encoding);
@@ -64,8 +66,18 @@ exports.readFile = {
 
 
 exports.getList = {
-    method: "POST",
+    method: "GET",
     handle: async (req, res) => {
-        console.log(req.body)
+        if(!Reflect.has(req.query, 'id')){
+            res.status(500).send({
+                status: false,
+                message: "必须传入文件夹id"
+            })
+        }
+        let data = await fileService.getDirectoryInfo(Number(req.query.id));
+        res.send({
+            status: true,
+            data: data
+        })
     }
 }

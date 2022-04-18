@@ -20,6 +20,14 @@ class Directories extends Models {
     hasManyDirectories(){
         return this.hasMany(this.table, 'id', 'parent_id');
     }
+
+    /**
+     * @method getInfoWithFileAndDirectory 获取文件夹信息及其子文件与子文件夹
+     * @param {number} id 文件夹id
+     */
+    getInfoWithFileAndDirectory(id){
+        return this.with(['hasManyDirectories', 'hasManyFiles']).findById(id);
+    }
 }
 
 export default Directories;
