@@ -18,5 +18,7 @@ var dateFormat = (format, date) => {
 
     return format;
 }
-
-export { dateFormat }
+const getEvent = () => {
+    return global.eventListener
+}
+export { dateFormat, getEvent }

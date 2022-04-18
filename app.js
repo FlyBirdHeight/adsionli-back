@@ -9,17 +9,20 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 //这里需要将database类挂载在全局对象下，以便查找
 import Database from "./modules/database/mysql.js"
+import { registerListener } from "./events/index.js"
+import * as Mq from "./modules/mq/index.js"
+import timerTaskStart from "./modules/timer/start.js"
 /**
  * README: 这里就把我们需要提前挂载或运行的对象实例化出来
  */
 const database = new Database();
 global.database = database;
-import { registerListener } from "./events/index.js"
-global.eventListener = registerListener(path.join(path.resolve(), 'events'))
-import * as Mq from "./modules/mq/index.js"
-global.mq = Mq.default;
-import timerTaskStart from "./modules/timer/start.js"
-timerTaskStart();
+const registerModule = async _ => {
+  global.eventListener = await registerListener(path.join(path.resolve(), 'events'))
+  global.mq = Mq.default;
+  timerTaskStart();
+}
+registerModule();
 
 var app = express();
 global.__dirname = path.resolve();
