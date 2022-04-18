@@ -1,10 +1,32 @@
-var Delete = function (table) {
-    this.table = table;
+const deleteById = function (id) {
+    try {
+        let sql = `delete from ${this.table} where id = ${id}`;
+
+        return this.database.usePool(this.name, sql);
+    } catch (e) {
+        throw e;
+    }
 }
 
-Delete.prototype.deleteById = function(id){
+const destory = function (data) {
+    try {
+        let sql = `delete from ${this.table}`;
+        if (Array.isArray(data)) {
+            sql += ` where id in ${this.handleArrayData(data)};`;
+        } else if (data instanceof Object && Reflect.has(data, 'where')) {
+            sql = this.where(sql, data.where);
+        } else {
+            sql += ` where id = ${data};`;
+        }
 
+        return this.database.usePool(this.name, sql);
+    } catch (e) {
+        throw e;
+    }
 }
 
 
-export default Delete;
+export {
+    deleteById,
+    destory as delete
+};

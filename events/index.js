@@ -24,7 +24,7 @@ const getEvent = (path) => {
     return res;
 }
 
-const registerListener = async (path) => {
+const registerListener = (path) => {
     let eventList = getEvent(path);
     if (eventList.length != 0) {
         for (let event of eventList) {

@@ -17,12 +17,9 @@ import timerTaskStart from "./modules/timer/start.js"
  */
 const database = new Database();
 global.database = database;
-const registerModule = async _ => {
-  global.eventListener = await registerListener(path.join(path.resolve(), 'events'))
-  global.mq = Mq.default;
-  timerTaskStart();
-}
-registerModule();
+global.eventListener = registerListener(path.join(path.resolve(), 'events'))
+global.mq = Mq.default;
+timerTaskStart();
 
 var app = express();
 global.__dirname = path.resolve();
