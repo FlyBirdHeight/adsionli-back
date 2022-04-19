@@ -15,9 +15,7 @@ const insert = function (data) {
     for (let v of Reflect.ownKeys(data)) {
         addData.push(data[v]);
     }
-    this.setBucket('insert', sql, {
-        data: addData
-    });
+
     return this.database.usePool(this.name, sql, addData)
 }
 

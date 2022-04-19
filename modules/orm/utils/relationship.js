@@ -115,11 +115,10 @@ const categoricalData = (target_key, key, mainData, handleData, table) => {
 }
 /**
  * @method handleJointQuery 专门用于处理联合查询
- * @param {string} endFind 最后一次查询内容
+ * @param {string} sql 最后一次查询内容
  */
-const handleJointQuery = async function (endFind) {
-    let endHandle = this.handleBucket.get(endFind);
-    let mainData = await this.database.usePool(this.name, endHandle.sql);
+const handleJointQuery = async function (sql) {
+    let mainData = await this.database.usePool(this.name, sql);
     if (mainData.length == 0) {
         return [];
     }

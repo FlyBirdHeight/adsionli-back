@@ -1,11 +1,7 @@
 const deleteById = function (id) {
     try {
         let sql = `delete from ${this.table} where id = ${id}`;
-        this.setBucket('deleteById', sql, {
-            data: {
-                id
-            }
-        });
+
         return this.database.usePool(this.name, sql);
     } catch (e) {
         throw e;
@@ -23,9 +19,6 @@ const destory = function (data) {
             sql += ` where id = ${data};`;
         }
 
-        this.setBucket('deleteById', sql, {
-            data
-        });
         return this.database.usePool(this.name, sql);
     } catch (e) {
         throw e;

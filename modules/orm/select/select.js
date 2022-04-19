@@ -7,15 +7,11 @@
 const findById = function (id) {
     try {
         let sql = `select * from ${this.table} where id = ${id}`;
-        this.setBucket('find_by_id', sql, {
-            data: {
-                id
-            }
-        });        
+       
         if (!this.judgeJointQuery()) {
             return this.database.usePool(this.name, sql);
         }
-        return this.handleJointQuery("find_by_id");
+        return this.handleJointQuery(sql);
     } catch (e) {
         throw e;
     }
@@ -58,14 +54,11 @@ const select = function (condition, type = 'find') {
         } else if (type == 'find_all') {
             sql += ''
         }
-        this.setBucket(type, sql, {
-            data: condition
-        });
 
         if (!this.judgeJointQuery()) {
             return this.database.usePool(this.name, sql);
         }
-        return this.handleJointQuery(type);
+        return this.handleJointQuery(sql);
     } catch (e) {
         throw e;
     }

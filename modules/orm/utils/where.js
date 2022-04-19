@@ -25,8 +25,6 @@ const betweenData = function (data, key, table = '') {
  * @param {*} data 
  */
 const handleArrayData = function (data) {
-    console.log(data);
-
     let sql = '';
     if (data.length < 2) {
         sql += handleDataString(data[0]);
@@ -105,7 +103,7 @@ const handleWhereType = function (type, data, key) {
                 sql += ` not in (${handleArrayData(data)})`;
                 break;
             case '!=':
-                sql += ` != ${handleDataString(data)}}`;
+                sql += ` != ${handleDataString(data)}`;
                 break;
             default:
                 break;
@@ -214,14 +212,6 @@ const where = function (sql, data) {
         } else {
             throw new WhereError(this.table)
         }
-        console.log(sql);
-
-        this.setBucket('where_handleWhereKey', sql, {
-            data: {
-                sql,
-                data
-            }
-        });
         return sql;
     } catch (e) {
         throw e;
