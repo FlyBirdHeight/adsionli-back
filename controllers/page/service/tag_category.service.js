@@ -13,26 +13,31 @@ class TagCategoryService {
      * @param {number} count
      */
     async getCategoryList(page, count) {
-        let data = await this.categoryModel.find({
-            page: page || 1,
-            count: count || 20,
-            where: {
-                is_delete: 0
-            },
-            sort: {
-                name: "sort",
-                type: "asc"
+        try {
+            let data = await this.categoryModel.find({
+                page: page || 1,
+                count: count || 20,
+                where: {
+                    is_delete: 0
+                },
+                sort: {
+                    name: "sort",
+                    type: "asc"
+                }
+            });
+            let dataCount = await this.categoryModel.getCount({
+                where: {
+                    is_delete: 0
+                }
+            })
+    
+            return {
+                data,
+                count: dataCount[0].count
             }
-        });
-        let dataCount = await this.categoryModel.getCount({
-            where: {
-                is_delete: 0
-            }
-        })
-
-        return {
-            data,
-            count: dataCount[0].count
+        }catch(e){
+            console.log(e);
+            throw e;
         }
     }
 

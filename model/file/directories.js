@@ -24,16 +24,25 @@ class Directories extends Models {
     /**
      * @method getInfoWithFileAndDirectory 获取文件夹信息及其子文件与子文件夹
      * @param {number} id 文件夹id
+     * @param {boolean} first 第一次请求根目录
      */
-    getInfoWithFileAndDirectory(id) {
-        return this.with(['hasManyDirectories', 'hasManyFiles']).find({
-            where: {
+    getInfoWithFileAndDirectory(id, first = false) {
+        let where;
+        if (first) {
+            where = {
                 parent_id: id,
                 id: {
                     type: "!=",
                     data: id
                 }
             }
+        } else {
+            where = {
+                id: id
+            }
+        }
+        return this.with(['hasManyDirectories', 'hasManyFiles']).find({
+            where
         });
     }
 }

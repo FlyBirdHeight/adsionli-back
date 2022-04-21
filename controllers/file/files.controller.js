@@ -36,7 +36,7 @@ exports.readFile = {
                         if (bl + buf.length > 360) {
                             let handleData = buf.slice(buf.length + bl - 360);
                             for (let i = 0; i < handleData.length; i += 8) {
-                                
+
                                 console.log(handleData.slice(i, i + 8).readFloatLE(0))
                             }
                         } else {
@@ -68,13 +68,14 @@ exports.readFile = {
 exports.getList = {
     method: "GET",
     handle: async (req, res) => {
-        if(!Reflect.has(req.query, 'id')){
+        if (!Reflect.has(req.query, 'id')) {
             res.status(500).send({
                 status: false,
                 message: "必须传入文件夹id"
             })
         }
-        let data = await fileService.getDirectoryInfo(Number(req.query.id));
+        let first = Reflect.has(req.query, 'first') ? Boolean(Number(req.query.first)) : false;
+        let data = await fileService.getDirectoryInfo(Number(req.query.id), first);
         res.send({
             status: true,
             data: data

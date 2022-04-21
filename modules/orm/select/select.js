@@ -72,7 +72,7 @@ const getCount = function (condition) {
     try {
         condition['select'] = 'count(*)'
 
-        return this.select(condition, 'get_count')
+        return this.find(condition, 'get_count')
     } catch (e) {
         throw e;
     }
