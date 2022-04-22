@@ -1,17 +1,8 @@
 import Model from "../../lib/model"
 import ImageInsertFilter from "../../filter/file/ImageInsertFileter"
-import os from "os";
-var ifaces = os.networkInterfaces();
 const host = 3000;
 let ipConfig = "127.0.0.1";
-// for (var dev in ifaces) {
-//     ifaces[dev].forEach(function (details) {
-//         if (details.family == 'IPv4') {
-//             ipConfig = details.address;
-//             return;
-//         }
-//     });
-// }
+
 class Image extends Model {
     constructor() {
         super('local', 'images', 'files', [

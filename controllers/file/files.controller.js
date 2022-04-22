@@ -82,3 +82,35 @@ exports.getList = {
         })
     }
 }
+
+exports.get = [
+    {
+        method: "POST",
+        path: "info",
+        handle: async (req, res) => {
+            try {
+                let resData = await fileService.getInfo(req.body);
+                res.send({
+                    status: true,
+                    data: resData
+                })
+            } catch (e) {
+                res.status(500).send({
+                    status: false,
+                    data: e.toString || e.message
+                })
+            }
+        }
+    }
+]
+
+exports.create = [
+    {
+        method: "POST",
+        path: "directory",
+        handle: async (req, res) => {
+            console.log(req.body);
+            
+        }
+    }
+]
