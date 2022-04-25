@@ -157,7 +157,6 @@ class ImageService {
             req.pipe(busboy);
             busboy.on('file', function (name, file, info) {
                 console.log(info);
-                
                 const { filename, encoding, mimeType } = info;
                 fileName = filename;
                 if (name !== 'image') {
@@ -190,6 +189,35 @@ class ImageService {
                 });
             })
         })
+    }
+
+    /**
+     * @method verify 判断图片是否存在
+     * @param {{name: string, hash: string}} data 等待查询数据
+     * @return {exist: boolean, type: number} exist 是否存在, 存在类型：0未上传 1部分上传 2完全上传
+     */
+    async verify(data) {
+        let dbCount = await this.model.find({
+            select: "count(*) as count",
+            where: {
+                _link: "or",
+                name: data.name,
+                hash_tag: data.hash
+            }
+        })
+        console.log(dbCount);
+        
+        if (dbCount[0].count != 0) {
+            return {
+                exist: true,
+                type: 2
+            }
+        }
+
+        return {
+            exist: false,
+            type: 0
+        }
     }
 }
 

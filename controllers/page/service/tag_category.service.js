@@ -46,7 +46,6 @@ class TagCategoryService {
      * @param {*} insertData 添加分类数据
      */
     insertCategory(insertData) {
-        console.log(insertData)
         return this.categoryModel.insert(insertData);
     }
 

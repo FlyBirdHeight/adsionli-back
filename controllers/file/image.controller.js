@@ -25,6 +25,20 @@ exports.upload = [
                 status: true
             })
         }
+    },
+    {
+        method: "POST",
+        path: "slice",
+        handle: async (req, res) => {
+            try {
+                console.log(req.body);
+                res.send({
+                    status: true
+                })
+            } catch (e) {
+                res.status(500).end();
+            }
+        }
     }
 ]
 /**
@@ -72,6 +86,24 @@ exports.get = [
         }
     }
 ]
+
+exports.verify = {
+    method: "POST",
+    handle: async (req, res) => {
+        try {
+            let returnData = await imageService.verify(req.body);
+            res.send(Object.assign({
+                status: true
+            }, returnData))
+        } catch (e) {
+            console.log(e);
+            res.status(500).send({
+                status: false,
+                error: e.toString || e.message
+            })
+        }
+    }
+}
 
 /**
  * @method deleteImageFile 删除图片文件或文件夹
