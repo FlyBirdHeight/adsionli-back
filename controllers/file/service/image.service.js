@@ -1,10 +1,12 @@
 import Image from "../../../model/file/image"
 import Busboy from "busboy";
 import fs from "fs";
+import path from "path";
 class ImageService {
     constructor() {
         this.model = new Image();
-        this.defaultPath = `${global.__dirname}/public`
+        this.defaultPath = path.resolve(global.__dirname , '/public/images');
+        this.slicePath = path.resolve(global.__dirname , '/public/file/slice');
     }
 
     /**
@@ -146,6 +148,7 @@ class ImageService {
         return new Promise((resolve, reject) => {
             let body = req.body;
             let path = _this.defaultPath;
+            let url = '/images';
             let fileName = '';
             let busboy = Busboy({
                 headers: req.headers
@@ -156,7 +159,6 @@ class ImageService {
             let size = 0;
             req.pipe(busboy);
             busboy.on('file', function (name, file, info) {
-                console.log(info);
                 const { filename, encoding, mimeType } = info;
                 fileName = filename;
                 if (name !== 'image') {
@@ -205,8 +207,7 @@ class ImageService {
                 hash_tag: data.hash
             }
         })
-        console.log(dbCount);
-        
+
         if (dbCount[0].count != 0) {
             return {
                 exist: true,
@@ -218,6 +219,44 @@ class ImageService {
             exist: false,
             type: 0
         }
+    }
+
+    /**
+     * @method saveSlice 保存分片数据
+     * @param {*} request 请求体
+     */
+    saveSlice(request) {
+        return new Promise((resolve, reject) => {
+            let path = this.slicePath;
+            let busboy = Busboy({
+                headers: request.headers
+            })
+            let additional = {}
+            /**
+             * README: 这里busboy有个奇怪的坑，就是无法对field在后面的时候进行处理，
+             *         只能在传过来的formData中将file放在最后才可以，所以传过来的时候要注意一下
+             */
+            busboy.on('file', function (name, file, info) {
+                const { filename, encoding, mimeType } = info;
+                console.log(name);
+                console.log(file);
+                console.log(info);
+                
+            })
+            busboy.on('field', function (name, value, info) {
+                additional[name] = value;
+            })
+            //NOTE: 通过管道，把request中内容写入到busboy中
+            request.pipe(busboy);
+        })
+    }
+
+    /**
+     * @method mergeSlice 合并图片
+     * @param {*} fileInfo 合并文件内容
+     */
+    mergeSlice() {
+
     }
 }
 

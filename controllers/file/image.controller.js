@@ -31,11 +31,13 @@ exports.upload = [
         path: "slice",
         handle: async (req, res) => {
             try {
-                console.log(req.body);
+                let returnData = await imageService.saveSlice(req);
                 res.send({
                     status: true
                 })
             } catch (e) {
+                console.log(e);
+
                 res.status(500).end();
             }
         }
@@ -92,6 +94,7 @@ exports.verify = {
     handle: async (req, res) => {
         try {
             let returnData = await imageService.verify(req.body);
+
             res.send(Object.assign({
                 status: true
             }, returnData))
