@@ -66,6 +66,32 @@ const judgeExist = function (path) {
     }
 }
 /**
+ * @method mkdirDirectory 创建路径
+ * @param {string} path 
+ */
+const mkdirDirectory = function (path) {
+    try {
+        let realDirectory = this.path.parse(path);
+        if (this.judgeExist(realDirectory.dir)) {
+            return this;
+        }
+        let newPath = this.path.normalize(realDirectory.dir);
+        let pathList = newPath.split(this.path.sep);
+        let pathCur = '';
+        for (let i = 0; i < pathList; i++) {
+            pathCur = this.path.resolve(pathCur, pathList[i]);
+            if (this.judgeExist(pathCur)) {
+                continue;
+            }
+            this.fs.mkdirSync(pathCur);
+        }
+        return this;
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+/**
  * @method getLinkPath 获取软链接地址
  * @param {*} path 源文件地址
  */
@@ -84,6 +110,8 @@ const getRealPath = function (path) {
 export {
     createLink,
     unlinkPath,
+    judgeExist,
     getLinkPath,
-    getRealPath
+    getRealPath,
+    mkdirDirectory
 }

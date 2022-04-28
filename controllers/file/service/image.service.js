@@ -2,11 +2,13 @@ import Image from "../../../model/file/image"
 import Busboy from "busboy";
 import fs from "fs";
 import path from "path";
+import { ReadableStream } from "stream"
 class ImageService {
     constructor() {
         this.model = new Image();
-        this.defaultPath = path.resolve(global.__dirname , '/public/images');
-        this.slicePath = path.resolve(global.__dirname , '/public/file/slice');
+        this.defaultPath = path.resolve(global.__dirname, 'public/images');
+        this.slicePath = path.resolve(global.__dirname, 'public/file/slice');
+        this.fileHandle = global.file;
     }
 
     /**
@@ -141,59 +143,6 @@ class ImageService {
     }
 
     /**
-     * @method upload 上传文件
-     * @param {*} req
-     */
-    upload(req) {
-        return new Promise((resolve, reject) => {
-            let body = req.body;
-            let path = _this.defaultPath;
-            let url = '/images';
-            let fileName = '';
-            let busboy = Busboy({
-                headers: req.headers
-            })
-            if (Reflect.has(body, 'path')) {
-                path = path + body.path
-            }
-            let size = 0;
-            req.pipe(busboy);
-            busboy.on('file', function (name, file, info) {
-                const { filename, encoding, mimeType } = info;
-                fileName = filename;
-                if (name !== 'image') {
-                    reject({
-                        status: false,
-                        message: "上传文件类型不是图片"
-                    })
-                }
-                path = path + '/' + filename;
-                url += '/' + filename;
-                let writeStream = fs.createWriteStream(path);
-                file.on('data', (data) => {
-                    size += data.length
-                    writeStream.write(data);
-                })
-                file.on('end', function (data) {
-                    writeStream.end();
-                })
-            })
-            busboy.on('finish', function () {
-                resolve({
-                    status: true,
-                    message: "上传成功",
-                    data: {
-                        path,
-                        name: fileName,
-                        url,
-                        size
-                    }
-                });
-            })
-        })
-    }
-
-    /**
      * @method verify 判断图片是否存在
      * @param {{name: string, hash: string}} data 等待查询数据
      * @return {exist: boolean, type: number} exist 是否存在, 存在类型：0未上传 1部分上传 2完全上传
@@ -226,28 +175,36 @@ class ImageService {
      * @param {*} request 请求体
      */
     saveSlice(request) {
+        let _this = this;
         return new Promise((resolve, reject) => {
-            let path = this.slicePath;
-            let busboy = Busboy({
-                headers: request.headers
-            })
-            let additional = {}
-            /**
-             * README: 这里busboy有个奇怪的坑，就是无法对field在后面的时候进行处理，
-             *         只能在传过来的formData中将file放在最后才可以，所以传过来的时候要注意一下
-             */
-            busboy.on('file', function (name, file, info) {
-                const { filename, encoding, mimeType } = info;
-                console.log(name);
-                console.log(file);
-                console.log(info);
-                
-            })
-            busboy.on('field', function (name, value, info) {
-                additional[name] = value;
-            })
-            //NOTE: 通过管道，把request中内容写入到busboy中
-            request.pipe(busboy);
+            try {
+                let path = this.slicePath;
+                let busboy = Busboy({
+                    headers: request.headers
+                })
+                let additional = {};
+                additional['path'] = this.slicePath;
+                /**
+                 * README: 这里busboy有个奇怪的坑，就是无法对field在后面的时候进行处理，
+                 *         只能在传过来的formData中将file放在最后才可以，所以传过来的时候要注意一下
+                 */
+                busboy.on('file', async function (name, file, info) {
+                    const { filename, encoding, mimeType } = info;
+                    let returnData = await _this.fileHandle.saveSlice(file, additional);
+                    console.log(returnData);
+                    resolve({
+                        status: true
+                    })
+                })
+                busboy.on('field', function (name, value, info) {
+                    additional[name] = value;
+                })
+                //NOTE: 通过管道，把request中内容写入到busboy中
+                request.pipe(busboy);
+            } catch (e) {
+                console.log(e);
+                reject(e);
+            }
         })
     }
 
@@ -255,8 +212,9 @@ class ImageService {
      * @method mergeSlice 合并图片
      * @param {*} fileInfo 合并文件内容
      */
-    mergeSlice() {
-
+    mergeSlice(fileInfo) {
+        console.log(fileInfo);
+        
     }
 }
 

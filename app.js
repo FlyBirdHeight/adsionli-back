@@ -12,6 +12,7 @@ import Database from "./modules/database/mysql.js"
 import { registerListener } from "./events/index.js"
 import * as Mq from "./modules/mq/index.js"
 import timerTaskStart from "./modules/timer/start.js"
+import FileSetting from "./modules/file/index.js"
 /**
  * README: 这里就把我们需要提前挂载或运行的对象实例化出来
  */
@@ -19,6 +20,8 @@ const database = new Database();
 global.database = database;
 global.eventListener = registerListener(path.join(path.resolve(), 'events'))
 global.mq = Mq.default;
+global.file = new FileSetting();
+
 timerTaskStart();
 
 var app = express();

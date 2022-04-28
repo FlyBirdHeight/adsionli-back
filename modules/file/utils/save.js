@@ -10,7 +10,8 @@
 const saveSlice = function (file, options) {
     return new Promise((resolve, reject) => {
         try {
-            let fileWrite = this.fs.createWriteStream(this.path.resolve(options.path, `/${options.hash_key}_${options.idx}`));
+            let fileWrite = this.fs.createWriteStream(this.path.resolve(options.path, `./${options.hash_key}_${options.idx}`));
+
             file.on('data', (data) => {
                 fileWrite.write(data);
             })
@@ -37,21 +38,70 @@ const saveSlice = function (file, options) {
 }
 /**
  * @method saveMerge 保存合并文件
- * @param {{name: string, hash_key:string, linkPath: string}} options 传入数据
+ * @param {{name: string, hash_key:string, linkPath: string, sliceCount: number, type: string}} options 传入数据
  * @description 这里的操作步骤：1. 找到全部符合条件的分片数据
  * 2. 将分片数据全部写入到同一个文件中去
  * 3. 
  */
 const saveMerge = function (options) {
-
+    try {
+        let name = '';
+        options.name.split('.').splice(1, 0, `_${options.hash_key}`).forEach((v, i, a) => {
+            name += i == a.length - 1 ? `.${v}` : v
+        })
+        let deposit = this.path.resolve(global.__dirname, options.type == 'image' ? this.config.image : this.config.page, name);
+        let slicePath = this.path.resolve(global.__dirname, this.config.slice, options.hash_key);
+        let fd = this.fs.openSync(deposit, 'a+');
+        for (let i = 0; i < options.sliceCount; i++) {
+            let sliceData = slicePath + '_' + i;
+            if (!this.judgeExist(sliceData)) {
+                throw new Error("分片文件不存在！无法完成内容合并！");
+            }
+            let fileData = this.fs.readFileSync(sliceData);
+            this.fs.appendFileSync(fd, fileData);
+        }
+        this.fs.closeSync(fd);
+        this.createLink(deposit, this.path.resolve(global.__dirname, options.linkPath, options.name))
+        return this;
+    } catch (e) {
+        throw new Error("分片合并失败！" + e.message)
+    }
 }
 /**
  * @method save 保存文件
- * @param {*} file 文件内容
- * @param {*} options 配置参数
+ * @param {ReadableStream} file 文件内容
+ * @param {{path: string, name: string}} options 配置参数
  */
 const save = function (file, options) {
-
+    return new Promise((resolve, reject) => {
+        if (!this.judgeExist(options.path)) {
+            this.mkdirDirectory(options.path);
+        }
+        try {
+            let fileWrite = this.fs.createWriteStream(this.path.resolve(options.path, options.name));
+            file.on('data', (data) => {
+                fileWrite.write(data);
+            })
+            file.on('end', () => {
+                fileWrite.end();
+                resolve({
+                    status: true
+                })
+            })
+            file.on('error', () => {
+                fileWrite.end();
+                reject({
+                    status: false,
+                    message: "读取并写入文件时发生错误"
+                })
+            })
+        } catch (e) {
+            reject({
+                status: false,
+                message: "读取并写入文件时发生错误:" + e.message
+            })
+        }
+    })
 }
 
 export {

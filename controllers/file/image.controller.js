@@ -10,7 +10,9 @@ exports.upload = [
         handle: async (req, res) => {
             try {
                 let returnData = await imageService.uploadImage(req);
-                res.send(returnData)
+                res.send({
+                    status: true
+                })
             } catch (e) {
                 console.log(e);
             }
@@ -32,6 +34,22 @@ exports.upload = [
         handle: async (req, res) => {
             try {
                 let returnData = await imageService.saveSlice(req);
+                res.send({
+                    status: true
+                })
+            } catch (e) {
+                console.log(e);
+
+                res.status(500).end();
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "merge",
+        handle: async (req, res) => {
+            try {
+                let returnData = await imageService.mergeSlice(req.body);
                 res.send({
                     status: true
                 })
