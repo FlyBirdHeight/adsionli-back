@@ -39,7 +39,6 @@ exports.upload = [
                 })
             } catch (e) {
                 console.log(e);
-
                 res.status(500).end();
             }
         }
@@ -55,7 +54,6 @@ exports.upload = [
                 })
             } catch (e) {
                 console.log(e);
-
                 res.status(500).end();
             }
         }

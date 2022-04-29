@@ -2,6 +2,7 @@ import { loader } from './load_route.js';
 //因为使用了node的版本大于14,所以需要手动导入require才可以使用CommonJs模块引用
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
+var os = require('os');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -38,6 +39,24 @@ app.use(express.static(path.join(path.resolve(), 'public')));
 //动态路由生成
 const loadRoute = loader
 loadRoute(app, path.join(path.resolve(), 'controllers'));
+
+let getIpAddress = function () {
+  var interfaces = os.networkInterfaces();
+  for (var devName in interfaces) {
+    var iface = interfaces[devName];
+    for (var i = 0; i < iface.length; i++) {
+      var alias = iface[i];
+      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+        return alias.address;
+      }
+    }
+  }
+}
+global.netInfo = {
+  ip: getIpAddress(),
+  host: 3000
+}
+console.log(global.netInfo);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

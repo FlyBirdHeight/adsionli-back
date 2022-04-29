@@ -10,19 +10,20 @@
 const saveSlice = function (file, options) {
     return new Promise((resolve, reject) => {
         try {
-            let fileWrite = this.fs.createWriteStream(this.path.resolve(options.path, `./${options.hash_key}_${options.idx}`));
-
+            let fileWrite = this.fs.openSync(this.path.resolve(options.path, `./${options.hash_key}_${options.idx}`), 'a+');
             file.on('data', (data) => {
-                fileWrite.write(data);
+                this.fs.appendFileSync(fileWrite, data);
             })
-            file.on('end', () => {
-                fileWrite.end();
+            file.on('close', () => {
+                console.log('end');
+                this.fs.closeSync(fileWrite)
                 resolve({
                     status: true
                 })
             })
             file.on('error', () => {
-                fileWrite.end();
+                console.log('error');
+                this.fs.closeSync(fileWrite)
                 reject({
                     status: false,
                     message: "读取并写入文件时发生错误"
@@ -38,34 +39,35 @@ const saveSlice = function (file, options) {
 }
 /**
  * @method saveMerge 保存合并文件
- * @param {{name: string, hash_key:string, linkPath: string, sliceCount: number, type: string}} options 传入数据
+ * @param {{name: string, hash_key:string, linkPath: string, savePath: string, sliceCount: number, type: string}} options 传入数据
  * @description 这里的操作步骤：1. 找到全部符合条件的分片数据
  * 2. 将分片数据全部写入到同一个文件中去
- * 3. 
+ * 3. 创建软链接，并触发event，创建到数据库去，然后创建相关的文件夹
  */
 const saveMerge = function (options) {
-    try {
-        let name = '';
-        options.name.split('.').splice(1, 0, `_${options.hash_key}`).forEach((v, i, a) => {
-            name += i == a.length - 1 ? `.${v}` : v
-        })
-        let deposit = this.path.resolve(global.__dirname, options.type == 'image' ? this.config.image : this.config.page, name);
-        let slicePath = this.path.resolve(global.__dirname, this.config.slice, options.hash_key);
-        let fd = this.fs.openSync(deposit, 'a+');
-        for (let i = 0; i < options.sliceCount; i++) {
-            let sliceData = slicePath + '_' + i;
-            if (!this.judgeExist(sliceData)) {
-                throw new Error("分片文件不存在！无法完成内容合并！");
+    return new Promise((resolve, reject) => {
+        try {
+            let nameList = options.name.split('.');
+            let deposit = this.path.resolve(options.savePath, `${nameList[0]}_${options.hash_key}.${nameList[1]}`);
+            let slicePath = this.path.resolve(global.__dirname, `./${this.config.slice}`, options.hash_key);
+            let fd = this.fs.openSync(deposit, 'a+');
+            for (let i = 0; i < options.sliceCount; i++) {
+                let sliceData = slicePath + '_' + i;
+                if (!this.judgeExist(sliceData)) {
+                    throw new Error("分片文件不存在！无法完成内容合并！");
+                }
+                let fileData = this.fs.readFileSync(sliceData);
+                this.fs.appendFileSync(fd, fileData);
             }
-            let fileData = this.fs.readFileSync(sliceData);
-            this.fs.appendFileSync(fd, fileData);
+            this.fs.closeSync(fd);
+            this.createLink(deposit, this.path.resolve(options.linkPath, options.name))
+            resolve({
+                status: true
+            })
+        } catch (e) {
+            reject(new Error("分片合并失败！" + e.message))
         }
-        this.fs.closeSync(fd);
-        this.createLink(deposit, this.path.resolve(global.__dirname, options.linkPath, options.name))
-        return this;
-    } catch (e) {
-        throw new Error("分片合并失败！" + e.message)
-    }
+    })
 }
 /**
  * @method save 保存文件

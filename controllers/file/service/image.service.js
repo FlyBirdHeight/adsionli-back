@@ -2,11 +2,13 @@ import Image from "../../../model/file/image"
 import Busboy from "busboy";
 import fs from "fs";
 import path from "path";
-import { ReadableStream } from "stream"
 class ImageService {
     constructor() {
         this.model = new Image();
         this.defaultPath = path.resolve(global.__dirname, 'public/images');
+        this.defaultMergeImagePath = path.resolve(global.__dirname, 'public/file/images')
+        this.defaultMergePagePath = path.resolve(global.__dirname, 'pbulic/file/pages')
+        this.fileLinkPath = path.resolve(global.__dirname, 'public/file/link')
         this.slicePath = path.resolve(global.__dirname, 'public/file/slice');
         this.fileHandle = global.file;
     }
@@ -189,9 +191,7 @@ class ImageService {
                  *         只能在传过来的formData中将file放在最后才可以，所以传过来的时候要注意一下
                  */
                 busboy.on('file', async function (name, file, info) {
-                    const { filename, encoding, mimeType } = info;
                     let returnData = await _this.fileHandle.saveSlice(file, additional);
-                    console.log(returnData);
                     resolve({
                         status: true
                     })
@@ -212,9 +212,22 @@ class ImageService {
      * @method mergeSlice 合并图片
      * @param {*} fileInfo 合并文件内容
      */
-    mergeSlice(fileInfo) {
-        console.log(fileInfo);
-        
+    async mergeSlice(fileInfo) {
+        try {
+            let savePath = fileInfo.type == 'image' ? this.defaultMergeImagePath : this.defaultMergePagePath;
+            let linkPath = path.resolve(this.fileLinkPath, `./${fileInfo.path}`);
+            let status = await this.fileHandle.saveMerge({
+                name: fileInfo.name,
+                hash_key: fileInfo.hash_key,
+                linkPath,
+                savePath,
+                sliceCount: fileInfo.sliceCount,
+                type: fileInfo.type
+            })
+            return status;
+        } catch (e) {
+            throw e;
+        }
     }
 }
 

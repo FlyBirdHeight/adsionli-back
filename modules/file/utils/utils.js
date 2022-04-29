@@ -9,19 +9,25 @@
  */
 const createLink = function (file, linkPath) {
     try {
-        let fileExist = judgeExist(file);
+        let fileExist = this.judgeExist(file);
         if (!fileExist) {
             throw new Error("源文件不存在!")
         }
-        let linkExist = judgeExist(linkPath);
-        //NOTE: 如果软链接的前置路径不存在的话，就会去创建一个前置路径，当然这里要注意，必须提供完整路径且一级一级创建，不然会报错
+        let linkPathList = linkPath.substr(0).split('/').filter(v => {
+            return v != '';
+        });
+        linkPathList.pop();
+        linkPathList = "/" + linkPathList.join("/")
+        let linkExist = this.judgeExist(this.path.normalize(linkPathList));
+        // //NOTE: 如果软链接的前置路径不存在的话，就会去创建一个前置路径，当然这里要注意，必须提供完整路径且一级一级创建，不然会报错
         if (!linkExist) {
-            let linkPathList = linkPath.split('/');
-            linkPathList = linkPathList.pop();
-            let path = global.__dirname;
+            linkPathList = linkPathList.substr(0).split('/').filter(v => {
+                return v != '';
+            }).slice(8);
+            let path = this.path.resolve(global.__dirname, './public/file/link');
             for (let i = 0; i < linkPathList.length; i++) {
-                path = this.path.join(path, linkPathList[i]);
-                if (!judgeExist(path)) {
+                path = this.path.resolve(path, `./${linkPathList[i]}`);
+                if (!this.judgeExist(path)) {
                     this.fs.mkdirSync(path);
                 }
             }
@@ -58,12 +64,7 @@ const unlinkPath = function (file, linkPath) {
  * @param {string} path 文件/文件夹路径
  */
 const judgeExist = function (path) {
-    try {
-        this.fs.accessSync(path, this.fs.constants.F_OK);
-        return true;
-    } catch (e) {
-        return false;
-    }
+    return this.fs.existsSync(path)
 }
 /**
  * @method mkdirDirectory 创建路径
@@ -107,11 +108,24 @@ const getRealPath = function (path) {
     return this.fs.realpathSync(path);
 }
 
+/**
+ * @method deleteFile 删除文件
+ * @param {*} path 文件路径
+ */
+const deleteFile = function (path) {
+    if (!this.judgeExist(path)) {
+        throw new Error("当前文件路径不存在:" + path)
+    }
+    this.fs.unlinkSync(path);
+    return this;
+}
+
 export {
     createLink,
     unlinkPath,
     judgeExist,
     getLinkPath,
     getRealPath,
-    mkdirDirectory
+    mkdirDirectory,
+    deleteFile
 }
