@@ -82,7 +82,7 @@ class Directories extends Models {
                 set: {},
                 where: {}
             }
-            updateInfo.set[options.type] = options.data;
+            updateInfo.set[options.type] = Number(dirInfo[options.type]) + Number(options.data);
             updateInfo.where['id'] = options.id;
 
             let status = await this.update(updateInfo);

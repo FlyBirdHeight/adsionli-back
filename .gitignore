@@ -1,4 +1,4 @@
 config
 node_modules
-public/images/.*
-public/pages/.*
+public/file
+public/images
