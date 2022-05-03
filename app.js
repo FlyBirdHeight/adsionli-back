@@ -56,7 +56,6 @@ global.netInfo = {
   ip: getIpAddress(),
   host: 3000
 }
-console.log(global.netInfo);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

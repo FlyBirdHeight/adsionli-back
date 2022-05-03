@@ -1,9 +1,11 @@
-import Image from "../../../model/file/image"
+import Image from "../../../model/file/image.js"
 import Busboy from "busboy";
 import fs from "fs";
 import path from "path";
-class ImageService {
+import Service from "../../../lib/service.js";
+class ImageService extends Service {
     constructor() {
+        super();
         this.model = new Image();
         this.defaultPath = path.resolve(global.__dirname, 'public/images');
         this.defaultMergeImagePath = path.resolve(global.__dirname, 'public/file/images')
@@ -224,6 +226,17 @@ class ImageService {
                 sliceCount: fileInfo.sliceCount,
                 type: fileInfo.type
             })
+            if (status.status) {
+                this.event.emit('delete_slice', [fileInfo.hash_key, fileInfo.sliceCount])
+                this.event.emit('save_file', [status.fullPath, status.name, fileInfo.is_create, {
+                    link_path: path.resolve(status.linkPath, status.name),
+                    size: fileInfo.size,
+                    type: fileInfo.type,
+                    relativeLinkPath: '/' + path.relative(this.fileLinkPath.replace('/file/link', ''), status.linkPath),
+                    hash_tag: fileInfo.hash_key,
+                    directoryPath: status.linkPath
+                }])
+            }
             return status;
         } catch (e) {
             throw e;

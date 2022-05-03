@@ -3,7 +3,7 @@ import Models from "../../lib/model";
 class Directories extends Models {
     constructor() {
         super('local', 'directory', 'directories', [
-            'name', 'level', 'parent_id', 'full_path', 'real_path'
+            'name', 'level', 'parent_id', 'relative_path', 'real_path'
         ])
     }
 
@@ -30,7 +30,7 @@ class Directories extends Models {
         try {
             let data = await this.find({
                 where: {
-                    full_path: path
+                    relative_path: path
                 }
             })
 
@@ -45,7 +45,7 @@ class Directories extends Models {
 
     /**
      * @method addDirectory 添加文件
-     * @param {{name: string, level: number, parent_id: number, full_path: string, real_path: string}} info 文件目录信息
+     * @param {{name: string, level: number, parent_id: number, relative_path: string, real_path: string}} info 文件目录信息
      */
     addDirectory(info) {
         return this.insert(info);
@@ -53,15 +53,43 @@ class Directories extends Models {
 
     /**
      * @method getId 获取文件目录id
-     * @param {string} full_path 
+     * @param {string} relative_path 
      */
-    getId(full_path) {
+    getId(relative_path) {
         return this.find({
             select: "id",
             where: {
-                full_path
+                relative_path
             }
         })
+    }
+
+    /**
+     * @method updateInfo 更新文件目录内容：size:大小  directory_count: 目录数量 image_count: 图片数量
+     * @param { {id: number, type: string, data: number }} options 更新数据内容
+     */
+    async updateInfo(options) {
+        try {
+            let selectMember = options.type;
+            let dirInfo = await this.find({
+                select: selectMember,
+                where: {
+                    id: options.id
+                }
+            })
+            dirInfo = dirInfo[0];
+            let updateInfo = {
+                set: {},
+                where: {}
+            }
+            updateInfo.set[options.type] = options.data;
+            updateInfo.where['id'] = options.id;
+
+            let status = await this.update(updateInfo);
+            return status;
+        } catch (e) {
+            throw e;
+        }
     }
 
     /**

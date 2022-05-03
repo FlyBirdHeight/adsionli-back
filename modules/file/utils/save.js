@@ -62,7 +62,10 @@ const saveMerge = function (options) {
             this.fs.closeSync(fd);
             this.createLink(deposit, this.path.resolve(options.linkPath, options.name))
             resolve({
-                status: true
+                status: true,
+                fullPath: deposit,
+                name: options.name,
+                linkPath: options.linkPath
             })
         } catch (e) {
             reject(new Error("分片合并失败！" + e.message))

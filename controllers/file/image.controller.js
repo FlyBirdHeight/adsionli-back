@@ -1,4 +1,5 @@
 import { ImageService } from "./service/image.service.js"
+import path from "path"
 const imageService = new ImageService();
 /**
  * @method upload 上传图片文件
@@ -67,7 +68,7 @@ exports.download = {
     handle: async (req, res) => {
         try {
             let data = await imageService.getInfo(req.query.id);
-            res.download(data[0].path, data[0].name, (error) => {
+            res.download(path.relative(global.__dirname, data[0].path), data[0].name, (error) => {
                 console.log("error", error);
             })
         } catch (e) {

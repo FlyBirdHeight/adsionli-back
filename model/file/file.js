@@ -1,8 +1,4 @@
 import Model from "../../lib/model"
-import ImageInsertFilter from "../../filter/file/ImageInsertFileter"
-const host = 3000;
-let ipConfig = "127.0.0.1";
-
 class Files extends Model {
     constructor() {
         super('local', 'files', 'files', [
@@ -16,7 +12,7 @@ class Files extends Model {
      * @param {{path: string, type: number, name: string, description: string, url: string, size: number, directory_id: number, hash_tag: string, link_path: string}} info
      */
     addFile(info) {
-        return this.insert();
+        return this.insert(info);
     }
 
     /**
@@ -29,11 +25,10 @@ class Files extends Model {
 
     /**
      * @method generateUrl 生成外链
-     * @param {string} ip ip地址
      * @param {string} path 存放地址
      */
-    static generateUrl(ip, path) {
-        return `http://${ip}:${host}${path}`
+    static generateUrl(path) {
+        return `http://${global.netInfo.ip}:${global.netInfo.host}${path}`
     }
 }
 
