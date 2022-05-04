@@ -149,7 +149,7 @@ const handleJointQuery = async function (sql) {
             table: query.table,
             where
         })
-
+        
         categoricalData(query.target_key, query.key, mainData, child, query.table);
     }
 

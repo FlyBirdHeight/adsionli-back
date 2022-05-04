@@ -5,8 +5,9 @@ import * as Insert from "./insert/insert.js";
 import * as Relationship from "./utils/relationship.js"
 import * as Where from "./utils/where.js"
 import * as Utils from "./utils/utils.js"
+import * as Affair from "./affair/affair.js"
 const options = [
-    Select, Delete, Update, Insert, Relationship, Where, Utils
+    Select, Delete, Update, Insert, Relationship, Where, Utils, Affair
 ]
 const JointQuery = ["find_all", "find_one", "find", "find_by_id"]
 class DatabaseOrm {

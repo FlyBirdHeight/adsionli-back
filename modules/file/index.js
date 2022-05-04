@@ -3,8 +3,10 @@ import fs from "fs";
 import path from "path";
 import { save, saveSlice, saveMerge } from "./utils/save.js";
 import { createLink, unlinkPath, judgeExist, getLinkPath, getRealPath, mkdirDirectory, deleteFile } from "./utils/utils.js"
+import { renameFile, renameDirectory } from "./utils/rename.js"
 const handleList = {
-    save, saveSlice, saveMerge, createLink, unlinkPath, judgeExist, getLinkPath, getRealPath, mkdirDirectory, deleteFile
+    save, saveSlice, saveMerge, createLink, unlinkPath, judgeExist, getLinkPath, getRealPath, mkdirDirectory, deleteFile,
+    renameFile, renameDirectory
 }
 const require = createRequire(import.meta.url);
 /**

@@ -125,21 +125,48 @@ exports.verify = {
     }
 }
 
-/**
- * @method deleteImageFile 删除图片文件或文件夹
- */
-exports.deleteImageFile = {
-    method: "DELETE",
-    handle: async (req, res) => {
-
+exports.update = [
+    {
+        method: "PUT",
+        description: "文件重命名",
+        path: "rename",
+        handle: async (req, res) => {
+            try {
+                await imageService.renameFile(req.body);
+                res.send({
+                    status: true,
+                    data: "修改成功"
+                })
+            } catch (e) {
+                res.send({
+                    status: false,
+                    data: e.toString || e.message
+                })
+            }
+        }
+    },
+    {
+        method: "PUT",
+        description: "文件移动",
+        path: "path",
+        handle: async (req, res) => {
+            console.log(req.body);
+            res.send({
+                status: true,
+                data: true
+            })
+        }
     }
-}
-/**
- * @method updateImageInfo 更新图片文件或文件夹
- */
-exports.updateImageInfo = {
-    method: "PUT",
-    handle: async (req, res) => {
+]
 
+exports.delete = {
+    method: "DELETE",
+    description: "文件删除",
+    handle: async (req, res) => {
+        console.log(req.body);
+        res.send({
+            status: true,
+            data: true
+        })
     }
 }

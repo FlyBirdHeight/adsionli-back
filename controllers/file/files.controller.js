@@ -104,13 +104,60 @@ exports.get = [
     }
 ]
 
-exports.create = [
+exports.create = {
+    method: "POST",
+    path: "directory",
+    handle: async (req, res) => {
+        console.log(req.body);
+        res.send({
+            status: true,
+            data: true
+        })
+    }
+}
+
+exports.update = [
     {
-        method: "POST",
-        path: "directory",
+        method: "PUT",
+        description: "文件目录重命名",
+        path: "rename",
+        handle: async (req, res) => {
+            try {
+                let status = await fileService.renameDirectory(req.body);
+                res.send({
+                    status: true,
+                    data: true
+                })
+            } catch (e) {
+                res.send({
+                    status: false,
+                    data: e.toString || e.message
+                })
+            }
+        }
+    },
+    {
+        method: "PUT",
+        description: "文件目录移动",
+        path: "path",
         handle: async (req, res) => {
             console.log(req.body);
-            
+            res.send({
+                status: true,
+                data: true
+            })
         }
     }
 ]
+
+exports.delete = {
+    method: "DELETE",
+    description: "文件目录删除",
+    handle: async (req, res) => {
+        console.log(req.body);
+        res.send({
+            status: true,
+            data: true
+        })
+    }
+}

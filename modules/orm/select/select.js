@@ -2,13 +2,17 @@
 
 /**
 * @method findById 通过id进行寻找
-* @param {*} id 
+* @param {*} id 查询数据id
+* @param {boolean} returnSql 是否返回sql语句，不执行
 */
-const findById = function (id) {
+const findById = function (id, returnSql = false) {
     try {
         let sql = `select * from ${this.table} where id = ${id}`;
-       
+
         if (!this.judgeJointQuery()) {
+            if (returnSql) {
+                return { sql };
+            }
             return this.database.usePool(this.name, sql);
         }
         return this.handleJointQuery(sql);
@@ -16,20 +20,28 @@ const findById = function (id) {
         throw e;
     }
 }
-
-const findOne = function (condition) {
+/**
+* @method select 查找一条数据
+* @param {any} condition 查找条件
+* @param {boolean} returnSql 是否返回sql语句，不执行
+*/
+const findOne = function (condition, returnSql = false) {
     try {
         condition['one'] = true;
-        return this.select(condition, 'find_one')
+        return this.select(condition, 'find_one', returnSql)
     } catch (e) {
         throw e
     }
 }
-
-const findAll = function (condition) {
+/**
+* @method findAll 查找全部(不包含分页)
+* @param {any} condition 查找条件
+* @param {boolean} returnSql 是否返回sql语句，不执行
+*/
+const findAll = function (condition, returnSql = false) {
     try {
         condition['all'] = true;
-        return this.select(condition, 'find_all')
+        return this.select(condition, 'find_all', returnSql)
     } catch (e) {
         throw e
     }
@@ -37,8 +49,10 @@ const findAll = function (condition) {
 /**
 * @method select 查找数据内容(不包含分页)
 * @param {any} condition 查找条件
+* @param {string} type 查询类型
+* @param {boolean} returnSql 是否返回sql语句，不执行
 */
-const select = function (condition, type = 'find') {
+const select = function (condition, type = 'find', returnSql = false) {
     try {
         let sql = `select ${Reflect.has(condition, 'select') ? condition.select : '*'} from ${Reflect.has(condition, 'table') ? condition.table : this.table}`;
         if (Reflect.has(condition, 'where')) {
@@ -56,6 +70,9 @@ const select = function (condition, type = 'find') {
         }
 
         if (!this.judgeJointQuery()) {
+            if (returnSql) {
+                return { sql };
+            }
             return this.database.usePool(this.name, sql);
         }
         return this.handleJointQuery(sql);

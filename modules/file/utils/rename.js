@@ -3,14 +3,40 @@
  */
 /**
  * @method rename 修改文件名称
- * @param {*} file 文件
  * @param {string} oldPath 老的路径
  * @param {string} newPath 新的路径
  */
-const rename = function (file, oldPath, newPath) {
-
+const renameFile = async function (oldPath, newPath) {
+    try {
+        let status = this.judgeExist(oldPath)
+        if (!status) {
+            throw new Error("文件路径不存在")
+        }
+        this.fs.renameSync(oldPath, newPath);
+        return true
+    } catch (e) {
+        throw new Error(e);
+    }
+}
+/**
+ * @method rename 修改目录名称
+ * @param {string} oldPath 老的路径
+ * @param {string} newPath 新的路径
+ */
+const renameDirectory = function (oldPath, newPath) {
+    try {
+        let status = this.judgeExist(oldPath)
+        if (!status) {
+            throw new Error("文件路径不存在")
+        }
+        this.fs.renameSync(oldPath, newPath);
+        return true;
+    } catch (e) {
+        throw new Error(e);
+    }
 }
 
 export {
-    rename
+    renameFile,
+    renameDirectory
 }

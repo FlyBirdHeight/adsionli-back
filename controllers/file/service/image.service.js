@@ -11,8 +11,7 @@ class ImageService extends Service {
         this.defaultMergeImagePath = path.resolve(global.__dirname, 'public/file/images')
         this.defaultMergePagePath = path.resolve(global.__dirname, 'pbulic/file/pages')
         this.fileLinkPath = path.resolve(global.__dirname, 'public/file/link')
-        this.slicePath = path.resolve(global.__dirname, 'public/file/slice');
-        this.fileHandle = global.file;
+        this.slicePath = path.resolve(global.__dirname, 'public/file/slice')
     }
 
     /**
@@ -241,6 +240,41 @@ class ImageService extends Service {
         } catch (e) {
             throw e;
         }
+    }
+
+    /**
+     * @method renameFile 修改文件名称
+     * @param {{id: number, name: string, oldName: string}} data 修改文件数据
+     */
+    async renameFile(data) {
+        try {
+            let findData = await this.model.findById(data.id);
+            if (findData.length < 1) {
+                throw new Error("当前文件不存在")
+            }
+            let file = findData[0];
+            let oldNameList = data.oldName.split('.');
+            let newName = data.name + '.' + oldNameList[oldNameList.length - 1];
+            let linkPath = file.link_path.replace(data.oldName, newName);
+            let url = file.url.replace(data.oldName, newName);
+            let status = await this.model.update({
+                set: {
+                    name: newName,
+                    link_path: linkPath,
+                    url
+                },
+                where: {
+                    id: data.id
+                }
+            })
+            
+            await this.fileHandle.renameFile(file.link_path, linkPath);
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+
     }
 }
 

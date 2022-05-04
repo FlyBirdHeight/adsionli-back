@@ -1,19 +1,43 @@
+const getConnect = function () {
+    return new Promise((resolve, reject) => {
+        this.database.pool.get(this.database.database.get(this.name)).getConnection((error, connection) => {
+            if (error) {
+                reject(error)
+            }
+            resolve(connection);
+        })
+    })
+}
+
+/**
+ * @method getAffair 获取事务处理
+ */
+const getAffair = async function () {
+
+}
+
+
 /**
  * @method startAffair 开启事务处理
  * @param {boolean} locked 是否开启锁
  */
 const startAffair = async function (locked = false) {
-    //{run, begin, rollback, commit, locks}
-    let action = await this.database.mysql.transaction();
-    !locked && Reflect.deleteProperty(action, 'locks');
+    try {
+        //{run, begin, rollback, commit, locks}
+        let conn = await this.getConnect();
+        await conn.beginTransaction();
 
-    return action;
+        return conn;
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
 }
 
-/**
- * @method useAffair 进行事务处理
- * @param {Function[]} 等待执行的内容
- */
-const useAffair = async function(){
 
+
+export {
+    startAffair,
+    getConnect,
+    getAffair
 }

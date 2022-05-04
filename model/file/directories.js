@@ -99,18 +99,8 @@ class Directories extends Models {
      */
     getInfoWithFileAndDirectory(id, first = false) {
         let where;
-        if (first) {
-            where = {
-                parent_id: id,
-                id: {
-                    type: "!=",
-                    data: id
-                }
-            }
-        } else {
-            where = {
-                id: id
-            }
+        where = {
+            id: id
         }
         return this.with(['hasManyDirectories', 'hasManyFiles']).find({
             where

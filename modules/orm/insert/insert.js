@@ -1,6 +1,11 @@
 import InsertLoseMember from "../../../error/database/orm/insert/lose_memeber.error.js";
 
-const insert = function (data) {
+/**
+ * @method insert 向数据库添加数据
+ * @param {*} data 
+ * @param {boolean} returnSql 是否返回sql语句，不执行
+ */
+const insert = function (data, returnSql = false) {
     let repeatNum = Reflect.ownKeys(data).length;
     for (let key of this.insertMember) {
         if (!Reflect.has(data, key)) {
@@ -15,7 +20,11 @@ const insert = function (data) {
     for (let v of Reflect.ownKeys(data)) {
         addData.push(data[v]);
     }
-
+    if (returnSql) {
+        return {
+            sql, addData
+        }
+    }
     return this.database.usePool(this.name, sql, addData)
 }
 

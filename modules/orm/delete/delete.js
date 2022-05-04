@@ -1,14 +1,18 @@
-const deleteById = function (id) {
+const deleteById = function (id, returnSql = false) {
     try {
         let sql = `delete from ${this.table} where id = ${id}`;
-
+        if (returnSql) {
+            return {
+                sql
+            }
+        }
         return this.database.usePool(this.name, sql);
     } catch (e) {
         throw e;
     }
 }
 
-const destory = function (data) {
+const destory = function (data, returnSql = false) {
     try {
         let sql = `delete from ${this.table}`;
         if (Array.isArray(data)) {
@@ -18,7 +22,11 @@ const destory = function (data) {
         } else {
             sql += ` where id = ${data};`;
         }
-
+        if (returnSql) {
+            return {
+                sql
+            }
+        }
         return this.database.usePool(this.name, sql);
     } catch (e) {
         throw e;
