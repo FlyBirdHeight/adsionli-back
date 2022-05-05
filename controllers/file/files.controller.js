@@ -101,6 +101,32 @@ exports.get = [
                 })
             }
         }
+    },
+    {
+        method: "GET",
+        path: "infoById",
+        handle: async (req, res) => {
+            try {
+                let resData = await fileService.getById(req.query.id);
+                
+                if (resData.length == 0) {
+                    res.send({
+                        status: true,
+                        data: null
+                    })
+                } else {
+                    res.send({
+                        status: true,
+                        data: resData[0]
+                    })
+                }
+            } catch (e) {
+                res.status(500).send({
+                    status: false,
+                    data: e.toString || e.message
+                })
+            }
+        }
     }
 ]
 

@@ -106,6 +106,33 @@ class Directories extends Models {
             where
         });
     }
+
+    /**
+     * @method updateDirectoryPath 更新目录路径,本身与子集
+     * @param {Directories} directory 源路径
+     * @param {{name: string, oldName: string}} options 修改信息
+     * @param {boolean} returnSql 是否返回sql且不执行
+     */
+    updateDirectoryPath(directory, options, returnSql = true) {
+        return this.update({
+            set: {
+                relative_path: {
+                    noEdit: true,
+                    data: `concat('${directory.relative_path.replace(options.oldName, options.name)}', substring(relative_path, char_length('${directory.relative_path}') + 1))`
+                },
+                real_path: {
+                    noEdit: true,
+                    data: `concat('${directory.real_path.replace(options.oldName, options.name)}', substring(real_path, char_length('${directory.real_path}') + 1))`
+                },
+            },
+            where: {
+                relative_path: {
+                    type: "like",
+                    data: `${directory.relative_path}%`
+                }
+            }
+        }, returnSql);
+    }
 }
 
 export default Directories;

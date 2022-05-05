@@ -23,7 +23,7 @@ const renameFile = async function (oldPath, newPath) {
  * @param {string} oldPath 老的路径
  * @param {string} newPath 新的路径
  */
-const renameDirectory = function (oldPath, newPath) {
+const renameDirectory = async function (oldPath, newPath) {
     try {
         let status = this.judgeExist(oldPath)
         if (!status) {

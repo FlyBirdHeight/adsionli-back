@@ -103,6 +103,32 @@ exports.get = [
                 })
             }
         }
+    },
+    {
+        method: "GET",
+        path: "info",
+        handle: async (req, res) => {
+            try {
+                let data = await imageService.getInfo(req.query.id);
+                if (data.length == 0) {
+                    res.send({
+                        status: true,
+                        data: null
+                    })
+                } else {
+                    res.send({
+                        status: true,
+                        data: data[0]
+                    })
+                }
+            } catch (e) {
+                console.log("error", e);
+                res.status(500).send({
+                    status: false,
+                    error: e.toString || e.message
+                })
+            }
+        }
     }
 ]
 

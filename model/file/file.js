@@ -30,6 +30,34 @@ class Files extends Model {
     static generateUrl(path) {
         return `http://${global.netInfo.ip}:${global.netInfo.host}${path}`
     }
+
+    /**
+     * @method updateFileUrlAndPath 更新文件url与path，基于目录路径被修改
+     * @param {Directories} directory 源路径
+     * @param {{name: string, oldName: string}} options 修改信息
+     * @param {boolean} returnSql 是否返回sql且不执行
+     */
+    updateFileUrlAndPath(directory, options, returnSql = true) {
+        return this.update({
+            set: {
+                url: {
+                    noEdit: true,
+                    data: `concat(substring_index(url, '${directory.relative_path}', 1), '${directory.relative_path.replace(options.oldName, options.name)}',substring(url, char_length(concat(substring_index(url, '${directory.relative_path}', 1), '${directory.relative_path}')) + 1))
+                `
+                },
+                link_path: {
+                    noEdit: true,
+                    data: `concat('${directory.real_path.replace(options.oldName, options.name)}',substring(link_path, char_length('${directory.real_path}') + 1))`
+                }
+            },
+            where: {
+                url: {
+                    type: "like",
+                    data: `%${directory.relative_path}%`
+                }
+            }
+        }, returnSql);
+    }
 }
 
 export default Files

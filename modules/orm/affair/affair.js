@@ -10,20 +10,11 @@ const getConnect = function () {
 }
 
 /**
- * @method getAffair 获取事务处理
- */
-const getAffair = async function () {
-
-}
-
-
-/**
  * @method startAffair 开启事务处理
  * @param {boolean} locked 是否开启锁
  */
 const startAffair = async function (locked = false) {
     try {
-        //{run, begin, rollback, commit, locks}
         let conn = await this.getConnect();
         await conn.beginTransaction();
 
@@ -35,9 +26,7 @@ const startAffair = async function (locked = false) {
 }
 
 
-
 export {
     startAffair,
     getConnect,
-    getAffair
 }
