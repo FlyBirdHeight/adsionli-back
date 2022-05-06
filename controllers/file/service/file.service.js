@@ -1,6 +1,8 @@
 import Service from "../../../lib/service.js";
 import Directories from "../../../model/file/directories.js";
-import Files from "../../../model/file/file.js"
+import Files from "../../../model/file/files.js"
+import CreateDirectoryError from "../../../error/service/file/directories/create_directory_error.js";
+import DeleteDirectoryError from "../../../error/service/file/directories/delete_directory_error.js";
 class FileService extends Service {
     constructor() {
         super();
@@ -36,7 +38,7 @@ class FileService extends Service {
             finder.where = options.where;
         }
         console.log(finder);
-        
+
         return this.directoryModel.find(finder);
     }
 
@@ -81,6 +83,64 @@ class FileService extends Service {
             console.log(e);
             await connection.rollback();
             throw e;
+        }
+    }
+
+    /**
+     * @method createDirectory 创建目录
+     * @param {{name: string, parent_id: number}} options 创建内容
+     */
+    async createDirectory(options) {
+        let findData = await this.directoryModel.findById(options.parent_id);
+        if (findData.length == 0) {
+            throw new CreateDirectoryError("The current parent directory does not exist", {
+                name: options.name,
+                relative_path: ""
+            })
+        }
+        let parentInfo = findData[0];
+        options.relative_path = parentInfo.relative_path + '/' + options.name;
+        options.real_path = parentInfo.real_path + '/' + options.name;
+        options.level = parentInfo.level + 1;
+        try {
+            await this.fileHandle.mkdirDirectory(options.real_path, false);
+            let status = await this.directoryModel.insert(options);
+            this.event.emit('update_directory_count', [options.parent_id, 1]);
+            return true;
+        } catch (e) {
+            console.log(e);
+            throw new CreateDirectoryError(e.message, {
+                name: options.name,
+                relative_path: options.real_path
+            })
+        }
+    }
+
+    /**
+     * @method deleteDirectory 删除目录文件
+     * @param {{id: number}} options 待删除数据
+     */
+    async deleteDirectory(options) {
+        //NOTE: 开启事务进行删除，为了保证不会发生错误
+        let connection = await this.directoryModel.startAffair(true);
+        try {
+            let deleteSql = this.directoryModel.deleteById(options.id, true);
+            let findData = this.directoryModel.findById(options.id);
+            if (findData.length == 0) {
+                throw new DeleteDirectoryError("当前文件目录不存在!", options.id)
+            }
+            let dir = findData[0];
+            await connection.query(deleteSql);
+            await this.fileHandle.deleteFilesInDirectory(dir.real_path);
+            await this.fileHandle.deleteDirectory(dir.real_path);
+
+            return true;
+        } catch (e) {
+            connection.rollback();
+            console.log(e);
+            throw new DeleteDirectoryError(e.message, {
+                id: options.id
+            })
         }
     }
 }

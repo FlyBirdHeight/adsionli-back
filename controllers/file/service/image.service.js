@@ -1,12 +1,15 @@
 import Image from "../../../model/file/image.js"
+import Files from "../../../model/file/files.js"
 import Busboy from "busboy";
 import fs from "fs";
 import path from "path";
 import Service from "../../../lib/service.js";
+import DeleteFileError from "../../../error/service/file/files/delete_file_error.js";
 class ImageService extends Service {
     constructor() {
         super();
         this.model = new Image();
+        this.fileModel = new Files()
         this.defaultPath = path.resolve(global.__dirname, 'public/images');
         this.defaultMergeImagePath = path.resolve(global.__dirname, 'public/file/images')
         this.defaultMergePagePath = path.resolve(global.__dirname, 'pbulic/file/pages')
@@ -267,7 +270,7 @@ class ImageService extends Service {
                     id: data.id
                 }
             })
-            
+
             await this.fileHandle.renameFile(file.link_path, linkPath);
             return true;
         } catch (e) {
@@ -275,6 +278,39 @@ class ImageService extends Service {
             return false;
         }
 
+    }
+
+    /**
+     * @method deleteFile 删除文件
+     * @param {{id: number}} options 删除信息
+     * @description 主要就是从数据库中删除文件，并且删除软链接文件以及原始文件
+     */
+    async deleteFile(options) {
+        try {
+            let data = await this.fileModel.findById(options.id);
+            if (data.length == 0) {
+                throw new DeleteFileError("The current file does not exist!", {
+                    id: options.id
+                })
+            }
+            let fileInfo = data[0];
+            let path = fileInfo.path;
+            let linkPath = fileInfo.link_path;
+            await this.fileHandle.deleteFile(linkPath);
+            await this.fileHandle.deleteFile(path);
+            let status = await this.fileModel.deleteById(options.id);
+            if (fileInfo.type == 0) {
+                this.event.emit('update_directory_image_count', [fileInfo.directory_id, -1]);
+                this.event.emit('update_directory_size', [fileInfo.directory_id, -1 * Number(fileInfo.size)]);
+            }
+            return true;
+        } catch (e) {
+            console.log(e);
+            throw new DeleteFileError(e.message, {
+                id: options.id,
+                url: fileInfo.url
+            })
+        }
     }
 }
 

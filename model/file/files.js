@@ -1,4 +1,4 @@
-import Model from "../../lib/model"
+import Model from "../../lib/model.js"
 class Files extends Model {
     constructor() {
         super('local', 'files', 'files', [

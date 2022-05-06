@@ -189,10 +189,19 @@ exports.delete = {
     method: "DELETE",
     description: "文件删除",
     handle: async (req, res) => {
-        console.log(req.body);
-        res.send({
-            status: true,
-            data: true
-        })
+        try {
+            let responseData = await imageService.deleteFile(req.body);
+            res.send({
+                status: true,
+                data: true
+            })
+        }catch(e) {
+            console.log(e);
+            
+            res.status(500).send({
+                status: false,
+                message: e.toString || e.message
+            })
+        }
     }
 }

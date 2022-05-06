@@ -108,7 +108,7 @@ exports.get = [
         handle: async (req, res) => {
             try {
                 let resData = await fileService.getById(req.query.id);
-                
+
                 if (resData.length == 0) {
                     res.send({
                         status: true,
@@ -132,13 +132,20 @@ exports.get = [
 
 exports.create = {
     method: "POST",
-    path: "directory",
     handle: async (req, res) => {
-        console.log(req.body);
-        res.send({
-            status: true,
-            data: true
-        })
+        try {
+            console.log(req.body);
+            let status = fileService.createDirectory(req.body);
+            res.send({
+                status: true,
+                data: status
+            })
+        } catch (e) {
+            res.status(500).send({
+                status: false,
+                data: e.toString || e.message
+            })
+        }
     }
 }
 

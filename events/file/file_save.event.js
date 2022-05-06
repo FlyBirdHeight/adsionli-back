@@ -1,5 +1,5 @@
 import Directories from "../../model/file/directories.js"
-import Files from "../../model/file/file.js"
+import Files from "../../model/file/files.js"
 import path from "path"
 const directoryModel = new Directories();
 const fileModel = new Files();

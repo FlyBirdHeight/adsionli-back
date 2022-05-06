@@ -67,19 +67,20 @@ const judgeExist = function (path) {
     return this.fs.existsSync(path)
 }
 /**
- * @method mkdirDirectory 创建路径
+ * @method mkdirDirectory 创建目录
  * @param {string} path 
+ * @param {boolean} parse 是否规范化
  */
-const mkdirDirectory = function (path) {
+const mkdirDirectory = function (path, parse = true) {
     try {
-        let realDirectory = this.path.parse(path);
-        if (this.judgeExist(realDirectory.dir)) {
+        let realDirectory = parse ? this.path.parse(path).dir : path;
+        if (this.judgeExist(realDirectory)) {
             return this;
         }
-        let newPath = this.path.normalize(realDirectory.dir);
-        let pathList = newPath.split(this.path.sep);
+        let newPath = this.path.normalize(realDirectory);
+        let pathList = newPath.replace(global.__dirname, '').split(this.path.sep).filter(v => v != '');
         let pathCur = '';
-        for (let i = 0; i < pathList; i++) {
+        for (let i = 0; i < pathList.length; i++) {
             pathCur = this.path.resolve(pathCur, pathList[i]);
             if (this.judgeExist(pathCur)) {
                 continue;
@@ -119,6 +120,24 @@ const deleteFile = function (path) {
     this.fs.unlinkSync(path);
     return this;
 }
+/**
+ * @method deleteDirectory 删除文件目录
+ * @param {string} path 目录地址
+ */
+const deleteDirectory = async function (path) {
+    try {
+        if (!this.judgeExist(path)) {
+            throw new Error("当前目录路径不存在:" + path)
+        }
+        await this.fs.promises.rm(path, {
+            recursive: true,
+            force: true
+        })
+        return true
+    } catch (e) {
+        throw e;
+    }
+}
 
 export {
     createLink,
@@ -127,5 +146,6 @@ export {
     getLinkPath,
     getRealPath,
     mkdirDirectory,
-    deleteFile
+    deleteFile,
+    deleteDirectory
 }
