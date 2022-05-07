@@ -50,7 +50,7 @@ class FileSendProducer extends Producer {
                 template = 'file_setting'
                 break;
             case TYPE.DELETE:
-                template = 'file_setting'
+                template = 'file_delete'
                 break;
             case TYPE.USING:
                 template = 'file_using'

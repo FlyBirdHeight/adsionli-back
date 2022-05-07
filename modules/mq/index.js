@@ -127,7 +127,7 @@ class MqManager {
             await channel.close();
             return this;
         } catch (e) {
-            console.log("handleError",e);
+            console.log("handleError", e);
             throw e;
         }
     }
@@ -209,7 +209,7 @@ class MqManager {
         if (!this.exchangeList.has(exchangeName)) {
             throw new Error("Exchange is not Exist! Please emit true exchange name!")
         }
-        return await this.handle(async (channel, exchangeName, deleteBinding, otherExchange) => {
+        let fn = async (channel, exchangeName, deleteBinding, otherExchange) => {
             let cacheType = new Map(this.typeExchange);
             let cacheRouting = new Map(this.exchangeList);
             let cacheBinding = new Map(this.exchangeGroup);
@@ -247,7 +247,8 @@ class MqManager {
                 this.exchangeGroup = cacheBinding;
                 throw e;
             }
-        }, exchangeName, deleteBinding, otherExchange);
+        }
+        return await this.handle(fn, exchangeName, deleteBinding, otherExchange)
     }
 
     /**
@@ -350,7 +351,6 @@ class MqManager {
     handleDlx(data, routingKey, bindingKey, options = {}) {
 
     }
-
 }
 let mq = new MqManager();
 register.call(mq);

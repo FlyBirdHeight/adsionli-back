@@ -174,7 +174,6 @@ exports.update = [
         description: "文件目录移动",
         path: "path",
         handle: async (req, res) => {
-            console.log(req.body);
             res.send({
                 status: true,
                 data: true
@@ -187,10 +186,17 @@ exports.delete = {
     method: "DELETE",
     description: "文件目录删除",
     handle: async (req, res) => {
-        console.log(req.body);
-        res.send({
-            status: true,
-            data: true
-        })
+        try {
+            let status = await fileService.deleteDirectory(req.body);
+            res.send({
+                status: true,
+                data: true
+            })
+        } catch (e) {
+            res.status(500).send({
+                status: false,
+                data: e.message
+            })
+        }
     }
 }

@@ -61,13 +61,4 @@ const queue = [
     }
 ]
 
-const registerQueue = [];
-const generateQueue = () => {
-    for (let v of registerQueue) {
-        queue = queue.concat(v);
-    }
-}
-
-generateQueue();
-
 export default queue;

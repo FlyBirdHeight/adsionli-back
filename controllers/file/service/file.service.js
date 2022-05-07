@@ -124,19 +124,20 @@ class FileService extends Service {
         //NOTE: 开启事务进行删除，为了保证不会发生错误
         let connection = await this.directoryModel.startAffair(true);
         try {
-            let deleteSql = this.directoryModel.deleteById(options.id, true);
-            let findData = this.directoryModel.findById(options.id);
+            let deleteSql = await this.directoryModel.deleteById(options.id, true);
+            let findData = await this.directoryModel.findById(options.id);
             if (findData.length == 0) {
                 throw new DeleteDirectoryError("当前文件目录不存在!", options.id)
             }
             let dir = findData[0];
             await connection.query(deleteSql);
+            //TODO: 这里是否要放到events中去执行，执行失败放入消息队列，然后继续重新处理？先同步执行好了
             await this.fileHandle.deleteFilesInDirectory(dir.real_path);
             await this.fileHandle.deleteDirectory(dir.real_path);
-
+            await connection.commit()
             return true;
         } catch (e) {
-            connection.rollback();
+            await connection.rollback();
             console.log(e);
             throw new DeleteDirectoryError(e.message, {
                 id: options.id

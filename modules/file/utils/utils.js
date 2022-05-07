@@ -1,7 +1,7 @@
+import glob from "glob"
 /**
  * README: 常用的文件操作工具类的集合
  */
-
 /**
  * @method createLink 创建软链接
  * @param {string} file 源文件路径
@@ -110,34 +110,32 @@ const getRealPath = function (path) {
 }
 
 /**
- * @method deleteFile 删除文件
- * @param {*} path 文件路径
+ * @method getFilesInDirectory 获取目录下的全部文件
+ * @param {*} path 目录路径
  */
-const deleteFile = function (path) {
-    if (!this.judgeExist(path)) {
-        throw new Error("当前文件路径不存在:" + path)
-    }
-    this.fs.unlinkSync(path);
-    return this;
-}
-/**
- * @method deleteDirectory 删除文件目录
- * @param {string} path 目录地址
- */
-const deleteDirectory = async function (path) {
+const getFilesInDirectory = async function (path) {
     try {
+        let fileRealPath = [];
         if (!this.judgeExist(path)) {
             throw new Error("当前目录路径不存在:" + path)
         }
-        await this.fs.promises.rm(path, {
-            recursive: true,
-            force: true
-        })
-        return true
+        let fileList = glob.sync(`${path}/*`);
+        for (let v of fileList) {
+            let info = this.fs.statSync(v);
+            if (info.isDirectory()) {
+                fileRealPath.push(...(await this.getFilesInDirectory(v)));
+            } else {
+                let realPath = await this.getRealPath(v);
+                fileRealPath.push(realPath)
+            }
+        }
+        
+        return fileRealPath
     } catch (e) {
-        throw e;
+        throw new Error(e);
     }
 }
+
 
 export {
     createLink,
@@ -146,6 +144,5 @@ export {
     getLinkPath,
     getRealPath,
     mkdirDirectory,
-    deleteFile,
-    deleteDirectory
+    getFilesInDirectory
 }
