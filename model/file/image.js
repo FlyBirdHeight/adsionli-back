@@ -70,7 +70,7 @@ class Image extends Model {
      * @param {string} path 存放地址
      */
     static generateUrl(ip, path) {
-        return `http://${ip}:${host}${path}`
+        return `http://${'127.0.0.1'}:${host}${path}`
     }
 }
 
