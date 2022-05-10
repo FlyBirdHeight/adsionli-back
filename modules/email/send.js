@@ -28,8 +28,8 @@ const send = async (address, data, template) => {
                 html: template
             }
         }
-        let content = templateHtml[template](data);
-        let option = mailOption(address, content.title, content.content);
+        let content = Reflect.has(templateHtml, template) ? templateHtml[template](data) : null;
+        let option = mailOption(address, content ? content.title : "默认主题", content ? content.content : "默认主题");
         return transporter.sendMail(option);
     } catch (e) {
         throw e;

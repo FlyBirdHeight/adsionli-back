@@ -15,8 +15,7 @@ const register = async function () {
             return await this.registerQueue(v.queueName, v.options, v.exchangeName);
         })
         let queueRegisterStatus = await Promise.all(registerQueue);
-
-        console.log("Register Exchange and Queue success")
+        console.log("queue register success");
     } catch (e) {
         console.log(e);
     }

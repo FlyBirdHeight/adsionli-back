@@ -4,14 +4,38 @@
 const DailyUpdate = [
     {
         /**
-         * @description 将日程的状态从等待开始更新为开始
+         * @description 将未确认日程的状态自动变为确认态
          */
-        name: "daily_doing_update",
-        time: 86400,
-        open: false,
-        description: "日程开启的状态更新",
+        name: "daily_unconfirmed_update",
+        time: 1800,
+        open: true,
+        description: "将未确认日程的状态自动变为确认态",
         callback: () => {
-            
+            eventListener.emit("update_daily_unconfirmed_status");
+        }
+    },
+    {
+        /**
+         * @description 将未开始日程的状态且符合开始条件的话变为开始态
+         */
+        name: "daily_not_start_update",
+        time: 10,
+        open: true,
+        description: "将未开始日程的状态且符合开始条件的话变为开始态",
+        callback: () => {
+            eventListener.emit("update_daily_not_start_status");
+        }
+    },
+    {
+        /**
+         * @description 监听进行中日程的状态并相应改变
+         */
+        name: "update_daily_running_status",
+        time: 86400,
+        open: true,
+        description: "监听进行中日程的状态并相应改变",
+        callback: () => {
+            eventListener.emit("update_daily_running_status");
         }
     }
 ]

@@ -41,15 +41,14 @@ class Producer {
                 error: `Queue is not Exist: exchange:${exchangeName}, queue:${queueName}`
             })
         }
-        return await this.mq.handle(async (channel, exchangeName, queueName, data, options) => {
-            try {
-                let buf = Buffer.from(data);
-                await channel.publish(exchangeName, `${exchangeName == '' ? '' : `${exchangeName}/`}${queueName}`, buf, options);
-            } catch (e) {
-                console.log(e);
-                throw e;
-            }
-        }, exchangeName, queueName, data, options)
+        if (!this.mq.connection) {
+            await this.mq.reconnect();
+        }
+        let channel = await this.mq.createChannel();
+        let buf = Buffer.from(data);
+        await channel.publish(exchangeName, `${exchangeName == '' ? '' : `${exchangeName}/`}${queueName}`, buf, options);
+        await channel.close();
+        return true;
     }
 }
 

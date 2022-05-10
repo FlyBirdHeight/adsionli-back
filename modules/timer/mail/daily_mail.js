@@ -41,7 +41,7 @@ const DailyMail = [
     {
         name: "daily_mail_deadline",
         time: 86400,
-        open: false,
+        open: true,
         description: "用户日程结束时间倒计时，消息队列的消费，这里一般认为还有最后3天才触发",
         callback: () => {
             eventListener.emit("daily_mail_consumer", ["deadline"])
@@ -49,8 +49,8 @@ const DailyMail = [
     },
     {
         name: "daily_mail_confirm",
-        time: 60,
-        open: false,
+        time: 86400,
+        open: true,
         description: "用户确认完成时，消息队列的消费",
         callback: () => {
             eventListener.emit("daily_mail_consumer", ["confirm"])

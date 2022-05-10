@@ -41,7 +41,8 @@ const registerListener = (path) => {
             }
         }
     }
-
+    // console.log(eventHandle);
+    
     return eventHandle;
 }
 

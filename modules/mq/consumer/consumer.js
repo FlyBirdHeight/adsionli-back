@@ -19,7 +19,6 @@ class Consumer {
      * @method consumerData 消费数据
      * @param {*} fn 消费数据的执行方法
      * README: 如果是在一个topic下的exchange的话，那就可以传入一个模糊的队列名称，这样就可以通配好几个消息队列了
-     * @param {string} queueName 绑定消息队列的key
      * @param {*} options 额外携带参数
      */
     async consumerData(fn, queueName, options = {}) {
@@ -37,17 +36,26 @@ class Consumer {
             //NOTE: 这里设置了最大连接数，保证不会超时
             await channel.prefetch(this.maxConsumerCount, false);
             //NOTE: 判断当前队列是否存在
-            await this.mq.queueExist(queueName, channel);
+            let exist = await channel.checkQueue(queueName);
+            await channel.cancel(this.consumer);
+            // return;
             //NOTE: 开始消费队列内容
             await channel.consume(queueName, async (msg) => {
                 try {
-                    await fn(msg, channel);
-                    await channel.ack(msg)
+                    let status = await fn(msg, channel);
+                    console.log(status);
+                    
+                    if(status){
+                        await channel.ack(msg)
+                    }else {
+                        await channel.nack(msg)
+                    }
                 } catch (e) {
                     await channel.nack(msg)
                 }
             }, options)
         } catch (e) {
+            console.log("consumerError", e);
             throw new ConsumerError("", {
                 consumer: this.consumer,
                 error: e

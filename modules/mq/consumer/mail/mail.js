@@ -3,10 +3,10 @@
  */
 import Consumer from "../consumer.js"
 class MailConsumer extends Consumer {
-    constructor() {
-        super('MailConsumer');
+    constructor(consumerTag) {
+        super(consumerTag);
         this.consumerInfo = {
-            queueName: "mail/mail_setting_*",
+            queueName: "",
             options: {
                 consumerTag: this.consumer
             }

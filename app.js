@@ -14,23 +14,21 @@ import { registerListener } from "./events/index.js"
 import * as Mq from "./modules/mq/index.js"
 import timerTaskStart from "./modules/timer/start.js"
 import FileSetting from "./modules/file/index.js"
+global.__dirname = path.resolve();
 /**
  * README: 这里就把我们需要提前挂载或运行的对象实例化出来
  */
+global.mq = Mq.default;
 const database = new Database();
 global.database = database;
 global.eventListener = registerListener(path.join(path.resolve(), 'events'))
-global.mq = Mq.default;
 global.file = new FileSetting();
-
 timerTaskStart();
 
 var app = express();
-global.__dirname = path.resolve();
 // view engine setup
 app.set('views', path.join(path.resolve(), 'views'));
 app.set('view engine', 'jade');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

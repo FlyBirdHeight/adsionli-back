@@ -1,5 +1,6 @@
 import DailyMail from "./mail/daily_mail.js"
-const TimerList = [DailyMail];
+import DailyUpdate from "./daily/daily_update.js"
+const TimerList = [DailyMail, DailyUpdate];
 import TimerHandle from "./timer.js"
 var timerHandle = new TimerHandle();
 /**

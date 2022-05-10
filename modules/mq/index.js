@@ -26,6 +26,7 @@ class MqManager {
         this.dlxInfo = new Map();
         this.init();
         this.connect();
+        register.call(this)
     }
 
     init() {
@@ -90,7 +91,7 @@ class MqManager {
             let channel = await this.connection.createChannel();
             return channel;
         } catch (e) {
-            console.log(e);
+            console.log("createChannel:", e);
             throw e;
         }
     }
@@ -107,7 +108,7 @@ class MqManager {
             await channel.close();
             return this;
         } catch (e) {
-            console.log(e)
+            console.log("closeChannel:", e)
             throw e;
         }
     }
@@ -335,7 +336,7 @@ class MqManager {
             let status = await channel.checkQueue(queueName);
             return true;
         } catch (e) {
-            console.log(e);
+            console.log("queueExist:", e);
             channel = await this.createChannel();
             return false;
         }
@@ -353,6 +354,5 @@ class MqManager {
     }
 }
 let mq = new MqManager();
-register.call(mq);
 
 export default mq;
