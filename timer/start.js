@@ -1,7 +1,7 @@
 import DailyMail from "./mail/daily_mail.js"
 import DailyUpdate from "./daily/daily_update.js"
 const TimerList = [DailyMail, DailyUpdate];
-import TimerHandle from "./timer.js"
+import TimerHandle from "../lib/timer.js"
 var timerHandle = new TimerHandle();
 /**
  * @method setData 设置相关定时器参数,并启动定时器

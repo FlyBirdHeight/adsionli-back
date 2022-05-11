@@ -7,7 +7,7 @@ const DailyUpdate = [
          * @description 将未确认日程的状态自动变为确认态
          */
         name: "daily_unconfirmed_update",
-        time: 1800,
+        time: 30,
         open: true,
         description: "将未确认日程的状态自动变为确认态",
         callback: () => {
@@ -19,7 +19,7 @@ const DailyUpdate = [
          * @description 将未开始日程的状态且符合开始条件的话变为开始态
          */
         name: "daily_not_start_update",
-        time: 10,
+        time: 86400,
         open: true,
         description: "将未开始日程的状态且符合开始条件的话变为开始态",
         callback: () => {

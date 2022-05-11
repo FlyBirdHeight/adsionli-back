@@ -184,7 +184,6 @@ class ImageService extends Service {
         let _this = this;
         return new Promise((resolve, reject) => {
             try {
-                let path = this.slicePath;
                 let busboy = Busboy({
                     headers: request.headers
                 })

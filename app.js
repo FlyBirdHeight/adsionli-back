@@ -12,7 +12,7 @@ var logger = require('morgan');
 import Database from "./modules/database/mysql.js"
 import { registerListener } from "./events/index.js"
 import * as Mq from "./modules/mq/index.js"
-import timerTaskStart from "./modules/timer/start.js"
+import timerTaskStart from "./timer/start.js"
 import FileSetting from "./modules/file/index.js"
 global.__dirname = path.resolve();
 /**
