@@ -8,8 +8,8 @@ export default class PublishError extends ApplicationError {
     get toString() {
         return `
             An error occurred while the producer was sending data to the message queue！
-            Producer: ${Reflect.has(options, 'producer') ? options.producer : 'not setting'},
-            Error: ${options.error}
+            Producer: ${Reflect.has(this, 'producer') ? this.producer : 'not setting'},
+            Error: ${this.error}
         `
     }
 

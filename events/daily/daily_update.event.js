@@ -109,7 +109,7 @@ module.exports = {
                     id: updateList
                 }
             })
-        }catch(e) {
+        } catch (e) {
             console.log("update_daily_not_start_statuse", e);
             throw e;
         }
@@ -151,18 +151,29 @@ module.exports = {
                     continue;
                 }
             }
-            if (overTimeList.size != 0) {
-                for (let [email, value] of overTimeList.entries()) {
-                    await eventListener.emit("mail_producer", ["dailyMail", email, DailyQueueType.OVERTIME, value]);
-                }
-            }
+
             if (deadlineList.size != 0) {
                 for (let [email, value] of deadlineList.entries()) {
                     eventListener.emit("mail_producer", ["dailyMail", email, DailyQueueType.DEADLINE, value]);
                 }
             }
+            if (overTimeList.size != 0) {
+                for (let [email, value] of overTimeList.entries()) {
+                    eventListener.emit("mail_producer", ["dailyMail", email, DailyQueueType.OVERTIME, value]);
+                }
+                let updateList = []
+                for (let [k, v] of overTimeList.entries()) {
+                    updateList.push(v.id);
+                }
+                await dailyModel.updateStatus({
+                    type: 'overtime',
+                    id: updateList
+                })
+            }
+
         } catch (e) {
             console.log("update_daily_running_status", e);
+            throw e;
         }
     }
 }

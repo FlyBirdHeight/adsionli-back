@@ -7,7 +7,7 @@ class PoolError extends ApplicationError {
     get toString() {
         return `
             Database pool connect has some error: ${message},
-            sqlMessage: ${Reflect.has(options, 'sqlMessage') ? options.sqlMessage : 'null'},
+            sqlMessage: ${Reflect.has(this, 'sqlMessage') ? this.sqlMessage : 'null'},
             errorCode: ${this.statusCode}
         `
     }

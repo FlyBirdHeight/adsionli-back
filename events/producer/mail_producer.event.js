@@ -12,7 +12,6 @@ module.exports = {
             let obj = ProducerList[producer];
             let publishData = obj.setAddress(address).setTemplate(type).setData(data).handleDatatoString();
             let { routingKey, bindingKey, options } = obj.queueInfo;
-            // console.log(obj);
             await obj.sendMessage(routingKey, bindingKey, publishData, options);
         } catch (e) {
             console.log("mail_producer", e);

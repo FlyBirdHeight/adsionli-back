@@ -9,7 +9,7 @@ export default class DeleteDirectoryError extends ApplicationError {
         return `
             File directory delete failed!
             Reason: ${this.message},
-            DirectoryId: ${options.id},
+            DirectoryId: ${this.id},
         `
     }
 

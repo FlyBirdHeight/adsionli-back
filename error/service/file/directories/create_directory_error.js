@@ -9,8 +9,8 @@ export default class CreateDirectoryError extends ApplicationError {
         return `
             File directory creation failed!
             Reason: ${this.message},
-            Name: ${options.name},
-            RelativePath: ${options.relative_path || ""}
+            Name: ${this.name},
+            RelativePath: ${this.relative_path || ""}
         `
     }
 

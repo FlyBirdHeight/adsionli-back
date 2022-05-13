@@ -9,8 +9,8 @@ export default class DeleteFileError extends ApplicationError {
         return `
             File deletion failed!
             Reason: ${this.message},
-            FileId: ${options.id},
-            Url: ${options.url || ""}
+            FileId: ${this.id},
+            Url: ${this.url || ""}
         `
     }
 

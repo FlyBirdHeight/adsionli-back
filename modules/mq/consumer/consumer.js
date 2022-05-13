@@ -43,8 +43,6 @@ class Consumer {
             await channel.consume(queueName, async (msg) => {
                 try {
                     let status = await fn(msg, channel);
-                    console.log(status);
-                    
                     if(status){
                         await channel.ack(msg)
                     }else {

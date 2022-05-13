@@ -8,8 +8,8 @@ export default class ConsumerError extends ApplicationError {
     get toString() {
         return `
             Consumer has encountered an error while processing data！
-            Consumer: ${Reflect.has(options, 'consumer') ? options.consumer : 'not setting'},
-            Error: ${options.error}
+            Consumer: ${Reflect.has(this, 'consumer') ? this.consumer : 'not setting'},
+            Error: ${this.error}
         `
     }
 
