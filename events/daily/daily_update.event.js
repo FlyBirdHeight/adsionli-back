@@ -163,8 +163,11 @@ module.exports = {
                 }
                 let updateList = []
                 for (let [k, v] of overTimeList.entries()) {
-                    updateList.push(v.id);
+                    v.forEach(value => {
+                        updateList.push(value.id)
+                    })
                 }
+                
                 await dailyModel.updateStatus({
                     type: 'overtime',
                     id: updateList
