@@ -330,8 +330,10 @@ class ImageService extends Service {
             let fileInfo = selectData[0]
             let targetPath = fileInfo.link_path;
             let sourcePath = targetPath.replace(options.oldPath, options.relative_path);
-            this.fileHandle.changeFilePath(targetPath, sourcePath);
             let newUrl = fileInfo.url.replace(options.oldPath, options.relative_path);
+            
+            this.fileHandle.changeFilePath(targetPath, sourcePath);
+            
             await this.fileModel.update({
                 set: {
                     directory_id: options.directory_id,
