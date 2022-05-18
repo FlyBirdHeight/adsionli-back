@@ -93,7 +93,8 @@ exports.get = [
                 let data = await imageService.getList(req.body);
                 res.send({
                     status: true,
-                    data
+                    data: data.data,
+                    total: data.total
                 })
             } catch (e) {
                 console.log("error", e);

@@ -107,7 +107,7 @@ class ImageService extends Service {
      * @method getList 获取图片列表
      * @param {*} options 获取参数
      */
-    getList(options) {
+    async getList(options) {
         let finder = {
             select: '*',
             page: 1,
@@ -136,8 +136,13 @@ class ImageService extends Service {
         if (Reflect.has(options, 'page')) {
             finder.page = options.page
         }
+        let data = await this.model.find(finder);
+        let total = await this.model.getCount();
 
-        return this.model.find(finder);
+        return {
+            data,
+            total
+        }
     }
 
     /**

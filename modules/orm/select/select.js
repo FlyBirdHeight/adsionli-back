@@ -85,10 +85,10 @@ const select = function (condition, type = 'find', returnSql = false) {
  * @method getCount 获取检索条数
  * @param {*} condition 
  */
-const getCount = function (condition) {
+const getCount = function (condition = {}) {
     try {
-        condition['select'] = 'count(*)'
-
+        condition['select'] = 'count(*) as count'
+        
         return this.find(condition, 'get_count')
     } catch (e) {
         throw e;
