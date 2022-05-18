@@ -5,7 +5,8 @@ import * as Save from "./utils/save.js";
 import * as Utils from "./utils/utils.js"
 import * as Rename from "./utils/rename.js"
 import * as Delete from "./utils/delete.js";
-const handleList = [Save, Utils, Rename, Delete];
+import * as PathModify from "./utils/path_modify.js"
+const handleList = [Save, Utils, Rename, Delete, PathModify];
 const require = createRequire(import.meta.url);
 /**
  * README: 文件管理系统

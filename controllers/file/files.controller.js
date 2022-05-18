@@ -174,6 +174,7 @@ exports.update = [
         description: "文件目录移动",
         path: "path",
         handle: async (req, res) => {
+            let status = await fileService.changePath(req.body);
             res.send({
                 status: true,
                 data: true

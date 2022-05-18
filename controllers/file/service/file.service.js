@@ -144,6 +144,14 @@ class FileService extends Service {
             })
         }
     }
+
+    /**
+     * @method changePath 修改目录路径
+     * @param {{id: number, directory_id: number, relative_path: string}} options 修改内容
+     */
+    async changePath(options) {
+        console.log(options);
+    }
 }
 
 export default FileService

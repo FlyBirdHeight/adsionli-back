@@ -316,6 +316,38 @@ class ImageService extends Service {
             })
         }
     }
+
+    /**
+     * @method changePath 修改文件路径
+     * @param {{id: number, directory_id: number, relative_path: string, oldPath: string}} options 修改内容
+     */
+    async changePath(options) {
+        try {
+            let selectData = await this.fileModel.findById(options.id);
+            if (selectData.length == 0) {
+                return false;
+            }
+            let fileInfo = selectData[0]
+            let targetPath = fileInfo.link_path;
+            let sourcePath = targetPath.replace(options.oldPath, options.relative_path);
+            this.fileHandle.changeFilePath(targetPath, sourcePath);
+            let newUrl = fileInfo.url.replace(options.oldPath, options.relative_path);
+            await this.fileModel.update({
+                set: {
+                    directory_id: options.directory_id,
+                    link_path: sourcePath,
+                    url: newUrl
+                },
+                where: {
+                    id: fileInfo.id
+                }
+            })
+            return true;
+        } catch (e) {
+            console.log(e);
+            throw e;
+        }
+    }
 }
 
 export { ImageService }
