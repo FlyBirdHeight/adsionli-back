@@ -274,7 +274,6 @@ class ImageService extends Service {
                     id: data.id
                 }
             })
-
             await this.fileHandle.renameFile(file.link_path, linkPath);
             return true;
         } catch (e) {
@@ -332,7 +331,7 @@ class ImageService extends Service {
             let sourcePath = targetPath.replace(options.oldPath, options.relative_path);
             let newUrl = fileInfo.url.replace(options.oldPath, options.relative_path);
             
-            this.fileHandle.changeFilePath(targetPath, sourcePath);
+            this.fileHandle.changeFilePath(targetPath, sourcePath, fileInfo.path);
             
             await this.fileModel.update({
                 set: {

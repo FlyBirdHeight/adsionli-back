@@ -3,6 +3,7 @@ import Directories from "../../../model/file/directories.js";
 import Files from "../../../model/file/files.js"
 import CreateDirectoryError from "../../../error/service/file/directories/create_directory_error.js";
 import DeleteDirectoryError from "../../../error/service/file/directories/delete_directory_error.js";
+import ChangeDirectoryPathError from "../../../error/service/file/directories/change_directory_path_error.js";
 class FileService extends Service {
     constructor() {
         super();
@@ -147,10 +148,44 @@ class FileService extends Service {
 
     /**
      * @method changePath 修改目录路径
-     * @param {{id: number, directory_id: number, relative_path: string}} options 修改内容
+     * @param {{id: number, directory_id: number, relative_path: string, oldPath: string}} options 修改内容
      */
     async changePath(options) {
-        console.log(options);
+        let findData = await this.directoryModel.findById(options.directory_id);
+        let directoryData = await this.directoryModel.findById(options.id);
+        if (findData.length == 0 || directoryData.length == 0) {
+            throw new ChangeDirectoryPathError('父级/本目录不存在', {
+                id: options.id,
+                relative_path: options.relative_path
+            })
+        }
+        let selfInfo = directoryData[0]
+        let connection = await this.directoryModel.startAffair(true);
+        try {
+            let updateNameSql = await this.directoryModel.update({
+                set: {
+                    parent_id: options.directory_id
+                },
+                where: {
+                    id: options.id
+                }
+            }, true)
+            let updateDirectoryPath = await this.directoryModel.updateDirectoryPath(selfInfo, { name: options.relative_path, oldName: options.oldPath }, true);
+            let updateFilePath = await this.fileModel.updateFileUrlAndPath(selfInfo, { name: options.relative_path, oldName: options.oldPath }, true)
+            await connection.query(updateNameSql);
+            await connection.query(updateDirectoryPath);
+            await connection.query(updateFilePath);
+            this.fileHandle.changeDirectoryPath(selfInfo.real_path, selfInfo.real_path.replace(options.oldPath, options.relative_path));
+            await connection.commit();
+
+            return true;
+        } catch (e) {
+            await connection.rollback();
+            throw new ChangeDirectoryPathError(e.message, {
+                id: options.id,
+                relative_path: options.relative_path
+            })
+        }
     }
 }
 
