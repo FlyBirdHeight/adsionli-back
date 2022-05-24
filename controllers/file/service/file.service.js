@@ -164,7 +164,8 @@ class FileService extends Service {
         try {
             let updateNameSql = await this.directoryModel.update({
                 set: {
-                    parent_id: options.directory_id
+                    parent_id: options.directory_id,
+                    level: findData[0].level + 1
                 },
                 where: {
                     id: options.id
