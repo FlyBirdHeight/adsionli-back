@@ -48,7 +48,7 @@ exports.edit = {
 exports.delete = {
     method: "DELETE",
     handle: async (req, res) => {
-        let requestData = req.param.id;
+        let requestData = req.body.id;
         try {
             let status = await learningServe.deleteData(requestData);
             res.send({
@@ -97,8 +97,8 @@ exports.get = [
         path: "list",
         handle: async (req, res) => {
             let requestData = req.body;
-            let resData = await learningServe.getData('list', requestData);
             try {
+                let resData = await learningServe.getData('list', requestData);
                 res.send({
                     status: true,
                     data: resData.data,

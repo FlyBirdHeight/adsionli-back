@@ -100,10 +100,10 @@ class LearningCardService extends Service {
 
         let returnData = await this.cardModel.getLearningCardList(options);
         let totalCount = await this.cardModel.getCount();
-
+        
         return {
             data: returnData,
-            tatol: totalCount
+            total: totalCount[0].count
         }
     }
 }
