@@ -42,7 +42,7 @@ class LearningCard extends Models {
     getInfo(id) {
         return this.with(['hasManyQuestions']).find({
             where: {
-                id
+                id: id
             }
         })
     }

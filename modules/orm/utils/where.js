@@ -218,5 +218,6 @@ const where = function (sql, data) {
     }
 }
 export {
-    where
+    where,
+    handleArrayData
 }

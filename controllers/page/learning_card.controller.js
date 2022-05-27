@@ -29,7 +29,7 @@ exports.edit = {
     method: "PUT",
     handle: async (req, res) => {
         let requestData = req.body;
-        let status = await learningServe.createCard(req.body);
+        let status = await learningServe.editData(requestData);
         try {
             res.send({
                 status: true
@@ -74,8 +74,8 @@ exports.get = [
         method: "GET",
         path: "info",
         handle: async (req, res) => {
-            let requestData = req.param.id;
-            let resData = await learningServe.getData('info', { id: requestData });
+            let requestData = req.query.id;
+            let resData = await learningServe.getData('info', requestData);
             try {
                 res.send({
                     status: true,

@@ -51,27 +51,24 @@ class LearningCardService extends Service {
      * @param {*} updateData 待修改数据
      */
     async editData(updateData) {
-        let findData = await this.cardModel.findById(updateData.id);
-        let questionUpdateSql;
-        if (findData.length === 0) {
-            throw new Error('当前闪卡数据已删除！')
-        }
-        //NOTE: 前端会先判断是否需要更新问题，如果需要更新，再去处理，会传入需要更新的数据的
-        if (updateData.update_question) {
-            questionUpdateSql = this.questionModel.updateData(updateData.questions, true);
-        }
-        Reflect.deleteProperty(updateData, 'questions')
-        Reflect.deleteProperty(updateData, 'update_question')
-        Reflect.deleteProperty(updateData, 'id')
-        let cardUpdateSql = this.cardModel.update({
-            set: updateData,
-            where: {
-                id: updateData.id
+        try {
+            let findData = await this.cardModel.findById(updateData.id);
+            if (findData.length === 0) {
+                throw new Error('当前闪卡数据已删除！')
             }
-        }, true);
-        console.log(cardUpdateSql);
-        console.log(questionUpdateSql);
-        return true;
+            Reflect.deleteProperty(updateData, 'questions')
+            Reflect.deleteProperty(updateData, 'id')
+
+            await this.cardModel.update({
+                set: updateData,
+                where: {
+                    id: findData[0].id
+                }
+            });
+            return true;
+        } catch (e) {
+            throw e;
+        }
     }
 
     /**
@@ -94,13 +91,13 @@ class LearningCardService extends Service {
      */
     async getData(type, options) {
         if (type === 'info') {
-            let returnData = await this.cardModel.getInfo(options.id);
-            return returnData;
+            let returnData = await this.cardModel.getInfo(options);
+            return returnData[0];
         }
 
         let returnData = await this.cardModel.getLearningCardList(options);
         let totalCount = await this.cardModel.getCount();
-        
+
         return {
             data: returnData,
             total: totalCount[0].count
