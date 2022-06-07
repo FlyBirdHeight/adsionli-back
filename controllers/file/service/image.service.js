@@ -160,18 +160,16 @@ class ImageService extends Service {
      */
     async verify(data) {
         let dbCount = await this.model.find({
-            select: "count(*) as count",
             where: {
-                _link: "or",
-                name: data.name,
                 hash_tag: data.hash
             }
         })
 
-        if (dbCount[0].count != 0) {
+        if (dbCount.length != 0) {
             return {
                 exist: true,
-                type: 2
+                type: 2,
+                url: dbCount[0].url
             }
         }
 
@@ -232,18 +230,19 @@ class ImageService extends Service {
                 sliceCount: fileInfo.sliceCount,
                 type: fileInfo.type
             })
+            let relativeLinkPath = '/' + path.relative(this.fileLinkPath.replace('/file/link', ''), status.linkPath);
             if (status.status) {
                 this.event.emit('delete_slice', [fileInfo.hash_key, fileInfo.sliceCount])
                 this.event.emit('save_file', [status.fullPath, status.name, fileInfo.is_create, {
                     link_path: path.resolve(status.linkPath, status.name),
                     size: fileInfo.size,
                     type: fileInfo.type,
-                    relativeLinkPath: '/' + path.relative(this.fileLinkPath.replace('/file/link', ''), status.linkPath),
+                    relativeLinkPath,
                     hash_tag: fileInfo.hash_key,
                     directoryPath: status.linkPath
                 }])
             }
-            return status;
+            return { status, url: Files.generateUrl(relativeLinkPath) + '/' + fileInfo.name };
         } catch (e) {
             throw e;
         }
@@ -330,9 +329,9 @@ class ImageService extends Service {
             let targetPath = fileInfo.link_path;
             let sourcePath = targetPath.replace(options.oldPath, options.relative_path);
             let newUrl = fileInfo.url.replace(options.oldPath, options.relative_path);
-            
+
             this.fileHandle.changeFilePath(targetPath, sourcePath, fileInfo.path);
-            
+
             await this.fileModel.update({
                 set: {
                     directory_id: options.directory_id,

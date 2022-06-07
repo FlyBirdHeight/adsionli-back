@@ -6,7 +6,10 @@
  */
 const changeDirectoryPath = async function (targetPath, sourcePath) {
     await this.renameFile(targetPath, sourcePath);
-    
+    if (this.judgeExist(targetPath)) {
+        await this.deleteDirectory(targetPath);
+    }
+
     return true;
 }
 /**

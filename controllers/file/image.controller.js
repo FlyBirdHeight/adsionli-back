@@ -51,7 +51,8 @@ exports.upload = [
             try {
                 let returnData = await imageService.mergeSlice(req.body);
                 res.send({
-                    status: true
+                    status: true,
+                    url: returnData.url
                 })
             } catch (e) {
                 console.log(e);

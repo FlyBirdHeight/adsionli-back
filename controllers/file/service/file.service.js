@@ -38,7 +38,6 @@ class FileService extends Service {
         if (Reflect.has(options, 'where')) {
             finder.where = options.where;
         }
-        console.log(finder);
 
         return this.directoryModel.find(finder);
     }
