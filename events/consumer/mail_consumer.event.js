@@ -16,6 +16,7 @@ module.exports = {
                         event = global.eventListener;
                     }
                     let publishData = JSON.parse(data.content.toString());
+
                     if (type.indexOf(publishData.type) === -1) {
                         return false;
                     }

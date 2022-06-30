@@ -47,7 +47,6 @@ const createLink = function (file, linkPath) {
 const unlinkPath = function (file, linkPath) {
     try {
         let linkedPath = this.getLinkPath(file);
-        console.log(linkedPath);
         if (linkedPath !== linkPath) {
             throw new Error("当前文件的真实软链接地址与传入的软链接地址不匹配");
         }

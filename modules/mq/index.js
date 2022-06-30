@@ -57,6 +57,7 @@ class MqManager {
     async connect() {
         try {
             this.connection = await this.amqlib.connect(this.config);
+
             this.registerExchange("adsionli", 'direct');
         } catch (e) {
             console.log(e.message);
@@ -336,7 +337,6 @@ class MqManager {
             let status = await channel.checkQueue(queueName);
             return true;
         } catch (e) {
-            console.log("queueExist:", e);
             channel = await this.createChannel();
             return false;
         }
@@ -354,5 +354,6 @@ class MqManager {
     }
 }
 let mq = new MqManager();
+// console.log(mq);
 
 export default mq;

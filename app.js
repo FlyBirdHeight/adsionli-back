@@ -8,6 +8,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const cors = require("cors")
 //这里需要将database类挂载在全局对象下，以便查找
 import Database from "./modules/database/mysql.js"
 import { registerListener } from "./events/index.js"
@@ -33,7 +34,11 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(path.resolve(), 'public')));
+app.use(express.static(path.join(path.resolve(), 'public'), {
+  setHeaders: function (res, path, stat) {
+    res.set('Access-Control-Allow-Origin', '*')
+  }
+}));
 //动态路由生成
 const loadRoute = loader
 loadRoute(app, path.join(path.resolve(), 'controllers'));
@@ -70,7 +75,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
+app.use(cors())
 
 app.listen(3000, '0.0.0.0', () => {
   console.log("项目启动成功，运行端口：3000")
