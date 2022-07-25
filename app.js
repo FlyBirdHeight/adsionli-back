@@ -56,7 +56,7 @@ let getIpAddress = function () {
   }
 }
 global.netInfo = {
-  ip: getIpAddress(),
+  ip: '127.0.0.1',
   host: 3000
 }
 

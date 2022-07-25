@@ -70,7 +70,8 @@ class Image extends Model {
      * @param {string} path 存放地址
      */
     static generateUrl(ip, path) {
-        return `http://${'127.0.0.1'}:${host}${path}`
+        // return `https://adsionli-back.xslease.com${path}`
+        return `http://127.0.0.1:3000${path}`
     }
 }
 
