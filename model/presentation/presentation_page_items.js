@@ -1,6 +1,6 @@
 import Models from "../../lib/model";
 import PresentationPages from "./presentation_pages";
-
+import { Worker, isMainThread, parentPort, workerData } from "worker_threads"
 class PresentationPageItems extends Models {
     constructor() {
         super('local', 'presentation_page_items', 'presentation_page_items', [
