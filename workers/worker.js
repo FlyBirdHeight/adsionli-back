@@ -1,34 +1,92 @@
 import path from "path";
+import os from "os";
 import { Worker } from "worker_threads";
+import EventEmitter from "events";
 
-/**
- * @property {Worker[]} _workers 线程使用数组
- * @property {boolean[]} _activeWorkers 激活的线程数组
- * @property {any[]} _queue 排队中的任务队列
- */
-const _workers = [];
-const _activeWorkers = [];
-const _queue = [];
+const status = {
+    CREATE: 0,
+    SLEEP: 1,
+    WORK: 2,
+    ERROR: 3
+}
+// 线程池状态
+const WorkerPoolStates = {
+    TODO: 0,
+    READY: 1,
+    OFF: 2
+};
 
 class WorkerPool {
-    constructor(workerPath, numOfThreads) {
-        this.workerPath = workerPath;
+    constructor(numOfThreads = os.cpus().length - 2) {
+        this.runFunc = null;
+        this.options = null;
         this.numOfThreads = numOfThreads;
+        this.state = WorkerPoolStates.TODO;
+        /**
+         * @property {{status: string,worker:Worker}[]} _workers 线程使用数组
+         * @property {any[]} _queue 排队中的任务队列
+         */
+        this._workers = [];
+        this._queue = [];
         this.init();
     }
     /**
      * @method init 初始化线程
      */
-    init() {
-        if (this.numOfThreads < 11) {
-            throw new Error("线程池最小线程数必须大于等于1");
-        }
+    async init() {
+        try {
+            await new Promise((resolve, reject) => {
+                if (this.numOfThreads < 1) {
+                    reject(new Error("线程池最小线程数必须大于等于1"));
+                }
 
-        for (let i = 0; i < this.numOfThreads; i++) {
-            //NOTE: 创建线程
-            const worker = new Worker(this.workerPath);
-            _workers[i] = worker;
-            _activeWorkers[i] = false;
+                let event = new EventEmitter();
+                let successCount = 0;
+                let failedCount = 0;
+
+                event.on("spawning", (isSuccess, ErrorReason) => {
+                    if (isSuccess) {
+                        ++successCount;
+                    } else {
+                        ++failedCount;
+                    }
+                    // 如果所有线程都创建失败，那么直接抛出
+                    if (failedCount == this.numOfThreads) {
+                        this.state = WorkerPoolStates.OFF;
+                        reject(new Error(ErrorReason));
+                    }
+                    // 至少一个线程创建成功即可
+                    else if (successCount != 0 && successCount + failedCount == this.numOfThreads) {
+                        this.state = WorkerPoolStates.READY;
+                        resolve(true);
+                    }
+                });
+
+                for (let i = 0; i < this.numOfThreads; i++) {
+                    //NOTE: 创建线程
+                    const worker = new Worker(path.resolve(global.__dirname, './workers/utils/worker.js'));
+                    worker.on('online', (index => () => {
+                        this._workers[index].status = status.SLEEP;
+                        this._workers[index].worker.removeAllListeners();
+                        this._workers[index].worker.unref();
+                        event.emit("spawning", true);
+                    })(i))
+
+                    worker.on('error', (index => (ErrorReason) => {
+                        this._workers[index].status = status.ERROR;
+                        this._workers[index].worker.removeAllListeners();
+                        event.emit("spawning", false, ErrorReason);
+                    })(i))
+                    this._workers[i] = {
+                        status: status.CREATE,
+                        worker
+                    };
+
+                }
+            })
+            return true;
+        } catch (e) {
+            console.log(e)
         }
     }
     /**
@@ -36,11 +94,12 @@ class WorkerPool {
      */
     destroyed() {
         for (let i = 0; i < this.numOfThreads; i++) {
-            if (_activeWorkers[i]) {
-                throw new Error(`${_workers[i].threadId}正在进行工作`)
+            if (this._workers[i].status === status.WORK) {
+                throw new Error(`${this._workers[i].worker.threadId}正在进行工作`)
             }
             //NOTE: 关闭线程，不是销毁
-            _workers[i].terminate();
+            this._workers[i].worker.unref();
+            this._workers[i].status = status.SLEEP;
         }
     }
     /**
@@ -49,7 +108,8 @@ class WorkerPool {
      */
     checkWorkers() {
         for (let i = 0; i < this.numOfThreads; i++) {
-            if (!_activeWorkers[i]) {
+            if (this._workers[i].status === status.SLEEP) {
+                this._workers[i].worker.ref();
                 return i;
             }
         }
@@ -61,7 +121,7 @@ class WorkerPool {
      * @method run 运行线程
      * @param {*} getData
      */
-    run(getData) {
+    async run() {
         return new Promise((resolve, reject) => {
             /**
              * @description 
@@ -72,7 +132,10 @@ class WorkerPool {
              */
             const restWorker = this.checkWorkers();
             const queueItem = {
-                getData,
+                data: {
+                    execFunc: this.runFunc,
+                    options: this.options
+                },
                 callback: (error, result) => {
                     if (error) {
                         return reject(error);
@@ -82,7 +145,7 @@ class WorkerPool {
             }
 
             if (restWorker === -1) {
-                _queue.push(queueItem);
+                this._queue.push(queueItem);
                 return null;
             }
 
@@ -96,36 +159,54 @@ class WorkerPool {
      * @param {*} queue 等待执行任务
      */
     runWorker(workerId, queue) {
-        const worker = _workers[workerId];
-        _activeWorkers[workerId] = true;
+        const worker = this._workers[workerId].worker;
+        this._workers[workerId].status = status.WORK;
         const messageCallback = (result) => {
             queue.callback(null, result);
-            cleanUp()
+            cleanUp(status.SLEEP)
         }
 
         const errorCallback = (error) => {
             queue.callback(error);
-            cleanUp()
+            cleanUp(status.ERROR)
         }
 
-        const cleanUp = () => {
+        const cleanUp = (status) => {
             worker.removeAllListeners('message');
             worker.removeAllListeners('error');
+            this._workers[workerId].status = status;
 
-            _activeWorkers[workerId] = false;
-
-            if (!_queue.length) {
+            if (!this._queue.length) {
                 return null;
             }
 
-            this.runWorker(workerId, _queue.shift());
+            this.runWorker(workerId, this._queue.shift());
         }
 
         // 线程创建监听结果/错误回调
         worker.once('message', messageCallback);
         worker.once('error', errorCallback);
         // 向子线程传递初始data
-        worker.postMessage(queueItem.getData);
+        worker.postMessage(queue.data);
+    }
+
+    /**
+     * @method setFunc 设置线程处理时，使用的函数
+     * @param {Function} func
+     */
+    setFunc(func) {
+        if (typeof func !== 'function') {
+            throw new Error("线程处理任务出入的必须是一个函数对象")
+        }
+        this.runFunc = func.toString();
+
+        return this;
+    }
+
+    setOptions(options = null) {
+        this.options = options;
+
+        return this;
     }
 }
 

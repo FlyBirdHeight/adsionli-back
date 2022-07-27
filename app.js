@@ -15,7 +15,9 @@ import { registerListener } from "./events/index.js"
 import * as Mq from "./modules/mq/index.js"
 import timerTaskStart from "./timer/start.js"
 import FileSetting from "./modules/file/index.js"
+import WorkerPool from "./workers/worker.js"
 global.__dirname = path.resolve();
+
 /**
  * README: 这里就把我们需要提前挂载或运行的对象实例化出来
  */
@@ -24,6 +26,8 @@ const database = new Database();
 global.database = database;
 global.eventListener = registerListener(path.join(path.resolve(), 'events'))
 global.file = new FileSetting();
+global.threadPool = new WorkerPool();
+
 timerTaskStart();
 
 var app = express();
@@ -39,22 +43,11 @@ app.use(express.static(path.join(path.resolve(), 'public'), {
     res.set('Access-Control-Allow-Origin', '*')
   }
 }));
-//动态路由生成
+//NOTE: 动态路由生成
 const loadRoute = loader
 loadRoute(app, path.join(path.resolve(), 'controllers'));
 
-let getIpAddress = function () {
-  var interfaces = os.networkInterfaces();
-  for (var devName in interfaces) {
-    var iface = interfaces[devName];
-    for (var i = 0; i < iface.length; i++) {
-      var alias = iface[i];
-      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
-        return alias.address;
-      }
-    }
-  }
-}
+
 global.netInfo = {
   ip: '127.0.0.1',
   host: 3000
