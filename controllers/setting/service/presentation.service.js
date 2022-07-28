@@ -13,8 +13,32 @@ class PresentationService extends Service {
 
     /**
      * @method createPresentation 创建展示页内容
+     * @param {[]} presentationData 等待添加数据
      */
-    createPresentation() {
+    async createPresentation(presentationData) {
+        if (presentationData.length == 0) throw new Error("数据不可为空")
+        let presentationSave = {
+            page_count: presentationData.length,
+            presentation_page_list: [],
+            name: String(+new Date()),
+            description: "",
+            is_use: false
+        }
+        let createPage = [];
+        let itemList = new Map();
+        for (let value of presentationData) {
+            createPage.push({
+                page_key: value.page_key,
+                page_item_list: value.page_item_list,
+                page_config: JSON.stringify(value.config)
+            })
+            presentationSave.presentation_page_list.push(value.page_key)
+            itemList.set(value.page_key, {
+                page_key: value.page_key,
+                item: value.item
+            })
+        }
+        presentationSave.page_count = presentationSave.presentation_page_list.length;
 
     }
 
@@ -67,3 +91,5 @@ class PresentationService extends Service {
 
     }
 }
+
+export default PresentationService;

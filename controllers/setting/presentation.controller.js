@@ -1,3 +1,6 @@
+import PresentationService from "./service/presentation.service";
+const presentationService = new PresentationService();
+
 /**
  * @method get 获取个人展示页数据内容
  */
@@ -57,7 +60,17 @@ exports.create = [
         path: "presentation",
         description: "创建个人展示实体",
         handle: async (req, res) => {
-
+            try {
+                let status = await presentationService.createPresentation(req.body);
+                res.send({
+                    status: 'success'
+                })
+            } catch (e) {
+                res.status(500).send({
+                    status: "error",
+                    message: `创建失败:${e.message}`
+                })
+            }
         }
     },
     {
@@ -65,7 +78,10 @@ exports.create = [
         path: "showList",
         description: "创建展示集合",
         handle: async (req, res) => {
-
+            console.log(req.body)
+            res.send({
+                status: 'success'
+            })
         }
     }
 ]
