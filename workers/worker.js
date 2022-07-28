@@ -17,7 +17,7 @@ const WorkerPoolStates = {
 };
 
 class WorkerPool {
-    constructor(numOfThreads = os.cpus().length - 2) {
+    constructor(numOfThreads = os.cpus().length >> 1) {
         this.runFunc = null;
         this.options = null;
         this.numOfThreads = numOfThreads;

@@ -25,10 +25,28 @@ class Presentations extends Models {
 
     /**
      * @method isUpdate 判断当前页面是否发生了更新
+     * @param {[]} pageData
      * @param {number} id
      */
-    async isUpdate(id) {
+    async isUpdate(pageData, id) {
+        let presentationData = await (async (id) => {
+            let data = await this.findById(id);
 
+            return data[0];
+        })(id)
+        let pageList = presentationData.presentation_page_list;
+        let oldPage = this.pageModel.find({
+            select: "id, page_item_list, page_config",
+            where: {
+                page_key: pageList
+            }
+        })
+        if(oldPage.length !== pageData.length) {
+            return true;
+        }
+        let update = await this.pageModel.isUpdate(oldPage, pageData);
+
+        return update;
     }
 
     /**

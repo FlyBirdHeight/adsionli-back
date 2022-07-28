@@ -1,15 +1,15 @@
 export default function verifyUpdate(itemData) {
-    const compare = (newItem, oldItem) => {
-        for (let value of Reflect.ownKeys(newItem)) {
-            if (typeof newItem[value] == 'object' && Reflect.ownKeys(newItem[value]).length != 0) {
-                if (Reflect.ownKeys(newItem).length !== Reflect.ownKeys(oldItem).length) return true;
-                if (compare(newItem[value], oldItem[value])) return true;
+    const compare = (newData, oldData) => {
+        for (let value of Reflect.ownKeys(newData)) {
+            if (typeof newData[value] == 'object' && Reflect.ownKeys(newData[value]).length != 0) {
+                if (Reflect.ownKeys(newData).length !== Reflect.ownKeys(oldData).length) return true;
+                if (compare(newData[value], oldData[value])) return true;
             } else {
-                if (Array.isArray(newItem[value])) {
-                    if (newItem[value].join(",") === oldItem[value].join(",")) {
+                if (Array.isArray(newData[value])) {
+                    if (newData[value].join(",") === oldData[value].join(",")) {
                         return true;
                     }
-                } else if (newItem[value] !== oldItem[value]) {
+                } else if (newData[value] !== oldData[value]) {
                     return true;
                 } else {
                     continue
@@ -21,7 +21,7 @@ export default function verifyUpdate(itemData) {
     }
 
     for (let item of itemData) {
-        if (compare(item.newItem, item.oldItem)) {
+        if (compare(item.newData, item.oldData)) {
             return true;
         }
     }
