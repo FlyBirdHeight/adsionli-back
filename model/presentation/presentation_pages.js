@@ -1,9 +1,9 @@
 import Models from "../../lib/model";
 import PresentationPageItems from "./presentation_page_items";
-import verifyUpdate from "../../workers/presentation/verify.mjs";
+import verifyUpdate from "../../workers/presentation/verify.js";
 class PresentationPages extends Models {
     constructor() {
-        super('local', 'presentation_pages', 'presentation_pages', [
+        super('local', 'presentationPages', 'presentation_pages', [
             'page_key', 'page_config', 'page_item_list', 'presentation_id'
         ])
         this.structure = {

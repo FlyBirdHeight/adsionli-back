@@ -1,10 +1,9 @@
 import Models from "../../lib/model";
-import PresentationPages from "./presentation_pages";
-import verifyUpdate from "../../workers/presentation/verify.mjs";
+import verifyUpdate from "../../workers/presentation/verify.js";
 class PresentationPageItems extends Models {
     constructor() {
-        super('local', 'presentation_page_items', 'presentation_page_items', [
-            'item_index', 'type', 'config', 'page_id'
+        super('local', 'presentationPageItems', 'presentation_page_items', [
+            'item_index', 'type', 'config', 'page_id', 'value'
         ])
         this.structure = {
             id: NaN,
@@ -13,9 +12,9 @@ class PresentationPageItems extends Models {
             config: '[]',
             page_id: NaN,
             created_at: '',
-            updated_at: ''
+            updated_at: '',
+            value: ''
         }
-        this.pageModel = new PresentationPages();
     }
 
 
@@ -89,6 +88,41 @@ class PresentationPageItems extends Models {
         }
 
         return sliceData
+    }
+
+    /**
+     * @method getInsertData 处理一下需要新增的item的数据
+     * @param {[]} itemList
+     */
+    getInsertData(itemList) {
+        let returnData = [];
+        for (let value of itemList) {
+            if (value.item.length == 0) {
+                continue;
+            }
+            value.item.forEach(item => {
+                returnData.push({
+                    page_id: value.pageId,
+                    type: item.type,
+                    item_index: item.index,
+                    value: this.getValue(item, item.type),
+                    config: JSON.stringify(item.style)
+                })
+            })
+        }
+
+        return returnData;
+    }
+
+    getValue(value, type) {
+        switch (type) {
+            case 'text':
+                return value.data;
+            case 'image':
+                return value.url;
+            default:
+                return '';
+        }
     }
 }
 

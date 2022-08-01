@@ -66,6 +66,7 @@ exports.create = [
                     status: 'success'
                 })
             } catch (e) {
+                console.log(e)
                 res.status(500).send({
                     status: "error",
                     message: `创建失败:${e.message}`

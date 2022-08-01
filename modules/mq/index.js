@@ -46,7 +46,7 @@ class MqManager {
             await this.connect();
             return this;
         } catch (e) {
-            console.log(e);
+            console.log('connect error! reconnect!', e);
             throw e;
         }
     }
@@ -60,7 +60,7 @@ class MqManager {
 
             this.registerExchange("adsionli", 'direct');
         } catch (e) {
-            console.log(e.message);
+            console.log('connect error! connect!', e.message);
             throw e;
         }
     }
@@ -76,7 +76,7 @@ class MqManager {
             await this.connection.close();
             this.connection = null;
         } catch (e) {
-            console.log(e)
+            console.log('connect error! closeConnect!', e);
             throw e;
         }
     }

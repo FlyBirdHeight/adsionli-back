@@ -26,7 +26,7 @@ const database = new Database();
 global.database = database;
 global.eventListener = registerListener(path.join(path.resolve(), 'events'))
 global.file = new FileSetting();
-global.threadPool = new WorkerPool();
+// global.threadPool = new WorkerPool();
 
 timerTaskStart();
 

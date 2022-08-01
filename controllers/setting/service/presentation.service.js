@@ -1,8 +1,14 @@
 import Service from "../../../lib/service";
+import Presentations from "../../../model/presentation/presentations";
+import PresentationPages from "../../../model/presentation/presentation_pages";
+import PresentationPageItems from "../../../model/presentation/presentation_page_items";
 
 class PresentationService extends Service {
     constructor() {
         super();
+        this.presentationModel = new Presentations();
+        this.pageModel = new PresentationPages();
+        this.itemModel = new PresentationPageItems();
     }
     /**
      * @method isUpdate 判断是否发生了更新
@@ -13,20 +19,20 @@ class PresentationService extends Service {
 
     /**
      * @method createPresentation 创建展示页内容
-     * @param {[]} presentationData 等待添加数据
+     * @param {[]} data 等待添加数据
      */
-    async createPresentation(presentationData) {
-        if (presentationData.length == 0) throw new Error("数据不可为空")
+    async createPresentation(data) {
+        if (data.length == 0) throw new Error("数据不可为空")
         let presentationSave = {
-            page_count: presentationData.length,
+            page_count: data.length,
             presentation_page_list: [],
             name: String(+new Date()),
             description: "",
-            is_use: false
+            is_use: true
         }
         let createPage = [];
         let itemList = new Map();
-        for (let value of presentationData) {
+        for (let value of data) {
             createPage.push({
                 page_key: value.page_key,
                 page_item_list: value.page_item_list,
@@ -39,6 +45,65 @@ class PresentationService extends Service {
             })
         }
         presentationSave.page_count = presentationSave.presentation_page_list.length;
+        //NOTE: 开启事务
+        let connection = await this.presentationModel.startAffair(true);
+        try {
+            //NOTE: 新建集合
+            presentationSave.presentation_page_list = JSON.stringify(presentationSave.presentation_page_list)
+            let insertPresentation = await this.presentationModel.insert(presentationSave, true);
+            let resultMain = await new Promise((resolve, reject) => {
+                connection.query(insertPresentation.sql, insertPresentation.addData, function (error, results) {
+                    if (error) {
+                        reject(error)
+                    }
+                    resolve(results)
+                })
+            });
+            createPage = createPage.map(v => {
+                v.presentation_id = resultMain.insertId
+                v.page_item_list = JSON.stringify(v.page_item_list)
+                return v;
+            })
+            //NOTE: 新建Page页
+            let insertPage = await this.pageModel.insertMore(createPage, true);
+
+            let resultBody = await new Promise((resolve, reject) => {
+                connection.query(insertPage.sql, insertPage.addData, function (error, results) {
+                    if (error) {
+                        reject(error)
+                    }
+                    resolve(results)
+                })
+            });
+            
+            //NOTE: 新建Item
+            let startId = resultBody.insertId;
+            let affectCount = resultBody.affectedRows;
+            if (affectCount !== createPage.length) {
+                await connection.rollback();
+                throw new Error("创建失败：相关page创建不成功")
+            }
+            let itemData = [];
+            for (let i = 0; i < affectCount; i++) {
+                const pageKey = createPage[i].page_key;
+                let item = itemList.get(pageKey);
+                item.pageId = startId;
+                Reflect.deleteProperty(item, 'page_key')
+                startId++;
+                itemData.push(item)
+            }
+            itemList = null;
+            let insertData = this.itemModel.getInsertData(itemData);
+            let insertItem = this.itemModel.insertMore(insertData, true);
+            await connection.query(insertItem.sql, insertItem.addData);
+            await connection.commit();
+            
+            return true;
+        } catch (e) {
+            await connection.rollback();
+
+            throw new Error("创建失败：", e.message)
+        }
 
     }
 
