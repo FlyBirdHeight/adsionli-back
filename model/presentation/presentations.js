@@ -51,12 +51,11 @@ class Presentations extends Models {
 
     /**
      * @method getPresentationById 获取展示页通过id
-     * @param {number} id
+     * @param {*} where
      */
-    async getPresentationById(id, withItem = false) {
-        let where = { id };
+    async getPresentation(where, withItem = false) {
         if (!withItem) {
-            let data = await this.with('hasManyPages').find({
+            let data = await this.with(['hasManyPages']).find({
                 where
             })
 
@@ -67,7 +66,8 @@ class Presentations extends Models {
                 return null;
             }
             presentationData = presentationData[0];
-            let pageList = presentationData[0].presentation_page_list;
+            presentationData.presentation_page_list = JSON.parse(presentationData.presentation_page_list);
+            let pageList = presentationData.presentation_page_list;
             let pageData = await this.pageModel.getPageByKey(pageList);
             presentationData.presentation_page_list = presentationData.presentation_page_list.map(pageKey => {
                 let index = pageData.findIndex(page => page.page_key === pageKey);
@@ -80,7 +80,6 @@ class Presentations extends Models {
 
             return presentationData;
         }
-
     }
 }
 

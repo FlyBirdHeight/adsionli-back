@@ -2,7 +2,36 @@ import Service from "../../../lib/service";
 import Presentations from "../../../model/presentation/presentations";
 import PresentationPages from "../../../model/presentation/presentation_pages";
 import PresentationPageItems from "../../../model/presentation/presentation_page_items";
+/**
+ * @method handlePresentationData 处理一下数据库请求数据的返回值
+ * @param {*} data 
+ */
+const handlePresentationData = (data) => {
+    if (data.presentation_page_list.length === 0) {
+        return data;
+    }
+    data.presentation_page_list.forEach(page => {
+        page.page_config = JSON.parse(page.page_config);
+        page.page_item_list = JSON.parse(page.page_item_list);
+        Reflect.deleteProperty(page, 'created_at');
+        Reflect.deleteProperty(page, 'updated_at');
+        if (page.presentation_page_items.length !== 0) {
+            page.presentation_page_items.forEach(item => {
+                item.config = JSON.parse(item.config);
+                Reflect.deleteProperty(item, 'created_at');
+                Reflect.deleteProperty(item, 'updated_at');
+                if(item.type === 'text') {
+                    item.data = item.value;
+                }else if(item.type === 'image'){
+                    item.url = item.value;
+                }
+                Reflect.deleteProperty(item, 'value');
+            })
+        }
+    })
 
+    return data;
+}
 class PresentationService extends Service {
     constructor() {
         super();
@@ -26,7 +55,7 @@ class PresentationService extends Service {
         let presentationSave = {
             page_count: data.length,
             presentation_page_list: [],
-            name: String(+new Date()),
+            name: '首页展示',
             description: "",
             is_use: true
         }
@@ -75,7 +104,7 @@ class PresentationService extends Service {
                     resolve(results)
                 })
             });
-            
+
             //NOTE: 新建Item
             let startId = resultBody.insertId;
             let affectCount = resultBody.affectedRows;
@@ -97,7 +126,7 @@ class PresentationService extends Service {
             let insertItem = this.itemModel.insertMore(insertData, true);
             await connection.query(insertItem.sql, insertItem.addData);
             await connection.commit();
-            
+
             return true;
         } catch (e) {
             await connection.rollback();
@@ -123,9 +152,24 @@ class PresentationService extends Service {
 
     /**
      * @method getPresentation 获取展示页内容
+     * @param {string} presentationName 展示页名称
      */
-    getPresentation() {
+    async getPresentation(presentationName) {
+        try {
+            if (!Reflect.ownKeys(presentationName, 'name')) {
+                throw new Error("请传入展示页集合名称进行获取");
+            }
 
+            let name = presentationName.name;
+            let returnData = await this.presentationModel.getPresentation({
+                name
+            }, true)
+
+            return handlePresentationData(returnData);
+        } catch (e) {
+            console.log(e)
+            throw e;
+        }
     }
 
     /**

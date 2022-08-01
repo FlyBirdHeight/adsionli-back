@@ -68,7 +68,6 @@ exports.getInfo = [
         method: "GET",
         path: "tag/:id",
         handle: async (req, res) => {
-            console.log(req.params.id);
             res.send({
                 data: [],
                 status: true

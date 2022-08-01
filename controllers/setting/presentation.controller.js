@@ -16,7 +16,18 @@ exports.get = [
         method: "GET",
         path: "presentation",
         handle: async (req, res) => {
-
+            try {
+                let resData = await presentationService.getPresentation(req.query);
+                res.send({
+                    status: 'success',
+                    data: resData
+                })
+            } catch (e) {
+                res.status(500).send({
+                    status: 'error',
+                    message: e.message
+                })
+            }
         }
     }
 ]

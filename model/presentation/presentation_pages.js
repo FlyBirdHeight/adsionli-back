@@ -58,7 +58,7 @@ class PresentationPages extends Models {
      */
     getPage(id) {
         let where = { id };
-        return this.with('hasManyItems').find({
+        return this.with(['hasManyItems']).find({
             where
         })
     }
@@ -73,7 +73,7 @@ class PresentationPages extends Models {
             }
         }
 
-        return this.with('hasManyItems').find({
+        return this.with(['hasManyItems']).find({
             select: "*",
             where: {
                 page_key: key
