@@ -20,9 +20,9 @@ const handlePresentationData = (data) => {
                 item.config = JSON.parse(item.config);
                 Reflect.deleteProperty(item, 'created_at');
                 Reflect.deleteProperty(item, 'updated_at');
-                if(item.type === 'text') {
+                if (item.type === 'text') {
                     item.data = item.value;
-                }else if(item.type === 'image'){
+                } else if (item.type === 'image') {
                     item.url = item.value;
                 }
                 Reflect.deleteProperty(item, 'value');
@@ -164,7 +164,7 @@ class PresentationService extends Service {
             let returnData = await this.presentationModel.getPresentation({
                 name
             }, true)
-
+            if (!returnData) return null;
             return handlePresentationData(returnData);
         } catch (e) {
             console.log(e)

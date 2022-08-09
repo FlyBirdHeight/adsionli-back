@@ -41,7 +41,7 @@ class Presentations extends Models {
                 page_key: pageList
             }
         })
-        if(oldPage.length !== pageData.length) {
+        if (oldPage.length !== pageData.length) {
             return true;
         }
         let update = await this.pageModel.isUpdate(oldPage, pageData);
