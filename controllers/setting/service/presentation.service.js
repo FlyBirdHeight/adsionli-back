@@ -119,18 +119,24 @@ class PresentationService extends Service {
                 item.pageId = startId;
                 Reflect.deleteProperty(item, 'page_key')
                 startId++;
+                if (item.item.length === 0) {
+                    continue
+                }
                 itemData.push(item)
             }
             itemList = null;
-            let insertData = this.itemModel.getInsertData(itemData);
-            let insertItem = this.itemModel.insertMore(insertData, true);
-            await connection.query(insertItem.sql, insertItem.addData);
+            if (itemData.length !== 0) {
+                let insertData = this.itemModel.getInsertData(itemData);
+                let insertItem = this.itemModel.insertMore(insertData, true);
+                await connection.query(insertItem.sql, insertItem.addData);
+            }
+
             await connection.commit();
 
             return true;
         } catch (e) {
             await connection.rollback();
-
+            console.log(e);
             throw new Error("创建失败：", e.message)
         }
 
